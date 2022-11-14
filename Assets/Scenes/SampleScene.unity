@@ -461,6 +461,7 @@ MonoBehaviour:
   populationPerWave: 60
   mutationRate: 0.055
   delayBetweenGenerations: 2
+  maintainBestWithNoMutation: 1
   bestAgentSelectionProportion: 0.3
   worstAgentSelectionProportion: 0
   crossoverProportion: 0.6
@@ -1105,7 +1106,7 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0.5
   m_Points:
-  - {x: -2.972408, y: 6.4325457}
+  - {x: -3.3986545, y: 6.693339}
   - {x: -1.9057026, y: 5.776209}
   - {x: -0.6383786, y: 4.969771}
   - {x: 0.6152823, y: 4.1422577}
@@ -1274,6 +1275,7 @@ EdgeCollider2D:
   - {x: -4.1405234, y: 6.9219484}
   - {x: -3.650053, y: 6.738234}
   - {x: -3.2146459, y: 6.54182}
+  - {x: -2.986785, y: 6.439032}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
@@ -1504,8 +1506,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: -8.742346, y: -11.459879, z: -0.00005}
-    m_Extent: {x: 16.501644, y: 20.613466, z: 0.00005}
+    m_Center: {x: -8.742344, y: -11.459879, z: 0}
+    m_Extent: {x: 16.501646, y: 20.613466, z: 0}
 --- !u!1 &1137597180
 GameObject:
   m_ObjectHideFlags: 0
@@ -2000,8 +2002,8 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 2.0298042, y: -0.21946144, z: -0.00005}
-    m_Extent: {x: 12.2584305, y: 16.910934, z: 0.00005}
+    m_Center: {x: 2.0298042, y: -0.21946144, z: 0}
+    m_Extent: {x: 12.2584305, y: 16.910934, z: 0}
 --- !u!1 &1297377814
 GameObject:
   m_ObjectHideFlags: 0
@@ -2672,5 +2674,5 @@ SpriteShapeRenderer:
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   - {fileID: 21300000, guid: 608e61deb05c54660bebf5a4dd2ee02d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 3.5679092, y: -0.47109604, z: -0.00005}
-    m_Extent: {x: 28.501858, y: 37.36074, z: 0.00005}
+    m_Center: {x: 3.5679092, y: -0.47109604, z: 0}
+    m_Extent: {x: 28.501858, y: 37.36074, z: 0}

@@ -22,6 +22,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     public float delayBetweenGenerations;
 
     [Header("Crossover Settings")]
+    public int maintainBestWithNoMutation = 1;
     [Range(0f, 1f)] public float bestAgentSelectionProportion = 0.3f;
     int bestAgentSelectionCount;
     [Range(0f, 1f)] public float worstAgentSelectionProportion = 0.0f;
@@ -174,6 +175,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             newPopulation[naturallySelected].fitness = 0f;
 
             int numberOfThisNetwork = Mathf.RoundToInt(population[i].fitness) * 10;
+
             for(int c = 0; c < numberOfThisNetwork; c++)
             {
                 genePool.Add(i);
@@ -268,7 +270,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
     void Mutate(NeuralNetwork[] newPopulation)
     {
-        for(int i = 0; i < naturallySelected; i++)
+        for(int i = maintainBestWithNoMutation; i < naturallySelected; i++)
         {
             for(int c = 0; c < newPopulation[i].weights.Count; c++)
             {
