@@ -27,12 +27,6 @@ public class BugController : MonoBehaviour
     public LayerMask sensorLayerMask;
     float aSensor, bSensor, cSensor;
 
-    [Header("Network Options")]
-    public int LAYERS = 1;
-    public int NEURONS = 10;
-    public int INPUT_COUNT = 3;
-    public int OUTPUT_COUNT = 2;
-
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
 
@@ -202,15 +196,8 @@ public class BugController : MonoBehaviour
     {
         if(network != null)
         {
-            if(isMultiSpawned)
-            {
-                FindObjectOfType<MultiGenerationGeneticManager>().Death(overallFitness, network, genome);
-                Destroy(gameObject);
-            }
-            else
-            {
-                FindObjectOfType<GeneticManager>().Death(overallFitness, network);
-            }
+            FindObjectOfType<MultiGenerationGeneticManager>().Death(overallFitness, network, genome);
+            Destroy(gameObject);
         }
         else
         {

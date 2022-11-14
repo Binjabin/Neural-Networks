@@ -78,6 +78,8 @@ public class NeuralNetwork
     //would have to be changed for more inputs
     public List<float> RunNetwork(List<float> inputValues)
     {
+        
+
         for(int i = 0; i < inputValues.Count; i++)
         {
             inputLayer[0, i] = inputValues[i];
@@ -96,12 +98,13 @@ public class NeuralNetwork
         outputLayer = ((hiddenLayers[ hiddenLayers.Count - 1] * weights[ weights.Count - 1]) + biases[ biases.Count - 1]).PointwiseTanh();
 
         //first is accel, second is steer
-        float steeringOutput = (float)Math.Tanh(outputLayer[0,1]);
-        float accelerationOutput = Sigmoid(outputLayer[0,0]);
 
         outputValues.Clear();
-        outputValues.Add(accelerationOutput);
-        outputValues.Add(steeringOutput);
+        for(int i = 0; i < outputLayer.ColumnCount; i++)
+        {
+            var outValue = Sigmoid(outputLayer[0,i]);
+            outputValues.Add(outValue);
+        }
         return outputValues;
     }
 
@@ -143,7 +146,6 @@ public class NeuralNetwork
         n.biases = newBiases;
 
         n.InitialiseHidden(hiddenLayerCount, hiddenNeuronCount, inputCount, outputCount);
-
         return n;
     }
 

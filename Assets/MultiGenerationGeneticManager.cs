@@ -9,7 +9,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 {
     [Header("References")]
     public GameObject bugPrefab;
-    BugController controller;
     public Transform spawnPoint;
 
     [Header("Generation Settings")]
@@ -44,6 +43,12 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI waveCounterText;
     [SerializeField] TextMeshProUGUI highestFitnessText;
     float highestFitness = 0f;
+
+    [Header("Network Options")]
+    public int LAYERS = 1;
+    public int NEURONS = 10;
+    public int INPUT_COUNT = 3;
+    public int OUTPUT_COUNT = 2;
     //TMProUGUI averageFitness;
 
 
@@ -65,7 +70,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     void CreatePopulation()
     {
         population = new NeuralNetwork[initialPopulation];
-        controller = bugPrefab.GetComponent<BugController>();
         FillPopulationWithRandomValues(population, 0);
         SpawnGeneration();
     }
@@ -103,7 +107,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         while(startingIndex < initialPopulation)
         {
             newPopulation[startingIndex] = new NeuralNetwork();
-            newPopulation[startingIndex].Initialise(controller.LAYERS, controller.NEURONS, controller.INPUT_COUNT, controller.OUTPUT_COUNT);
+            newPopulation[startingIndex].Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             startingIndex++;
         }
     }
@@ -171,7 +175,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         for(int i = 0; i < bestAgentSelectionCount; i++)
         {
             
-            newPopulation[naturallySelected] = population[i].InitialiseCopy(controller.LAYERS, controller.NEURONS, controller.INPUT_COUNT, controller.OUTPUT_COUNT);
+            newPopulation[naturallySelected] = population[i].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             newPopulation[naturallySelected].fitness = 0f;
 
             int numberOfThisNetwork = Mathf.RoundToInt(population[i].fitness) * 10;
@@ -187,7 +191,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         {
             int last = population.Length - 1;
             last -= i;
-            newPopulation[naturallySelected] = population[last].InitialiseCopy(controller.LAYERS, controller.NEURONS, controller.INPUT_COUNT, controller.OUTPUT_COUNT);
+            newPopulation[naturallySelected] = population[last].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             newPopulation[naturallySelected].fitness = 0f;
 
             int numberOfThisNetwork = Mathf.RoundToInt(population[last].fitness) * 10;
@@ -225,8 +229,8 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
             NeuralNetwork child1 = new NeuralNetwork();
             NeuralNetwork child2 = new NeuralNetwork();
-            child1.Initialise(controller.LAYERS, controller.NEURONS, controller.INPUT_COUNT, controller.OUTPUT_COUNT);
-            child2.Initialise(controller.LAYERS, controller.NEURONS, controller.INPUT_COUNT, controller.OUTPUT_COUNT);
+            child1.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+            child2.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             child1.fitness = 0;
             child2.fitness = 0;
 
