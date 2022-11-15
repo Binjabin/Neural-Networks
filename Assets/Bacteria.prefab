@@ -144,7 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b9740045f399fe85971de23d2019648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 4
+  speed: 1
   visionDistance: 1.5
   sensorLayerMask:
     serializedVersion: 2

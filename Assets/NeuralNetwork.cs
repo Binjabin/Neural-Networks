@@ -26,41 +26,59 @@ public class NeuralNetwork
     
     public void Initialise(int hiddenLayerCount, int hiddenNeuronCount, int inputCount, int outputCount)
     {
-        inputLayer = Matrix<float>.Build.Dense(1,inputCount);
-        outputLayer = Matrix<float>.Build.Dense(1, outputCount);
 
-        inputLayer.Clear();
         hiddenLayers.Clear();
-        outputLayer.Clear();
         weights.Clear();
         biases.Clear();
         outputValues.Clear();
 
+        inputLayer = Matrix<float>.Build.Dense(1,inputCount);
+        inputLayer.Clear();
+        biases.Add(0f);
 
-        for (int i = 0; i < hiddenLayerCount + 1; i++)
+        for (int i = 0; i < hiddenLayerCount; i++)
         {
             Matrix<float> f = Matrix<float>.Build.Dense(1, hiddenNeuronCount);
             hiddenLayers.Add(f);
-            biases.Add(Random.Range(-1f, 1f));
-
-            //weights
-            if (i == 0)
-            {
-                Matrix<float> inputToHidden1 = Matrix<float>.Build.Dense(inputCount, hiddenNeuronCount);
-                weights.Add(inputToHidden1);
-            }
-
-            Matrix<float> hiddentoHidden = Matrix<float>.Build.Dense(hiddenNeuronCount, hiddenNeuronCount);
-            weights.Add(hiddentoHidden);
+            biases.Add(0f);
         }
-        Matrix<float> hiddentoOutput = Matrix<float>.Build.Dense(hiddenNeuronCount, outputCount);
-        weights.Add(hiddentoOutput);
-        biases.Add(Random.Range(-1f, 1f));
 
-        RandomiseWeights();
+        outputLayer = Matrix<float>.Build.Dense(1,outputCount);
+        outputLayer.Clear();
+        biases.Add(0f);
+
+        for (int i = 0; i < hiddenLayerCount + 1; i++)
+        {
+            if(i == 0)
+            {
+                Matrix<float> inputToHidden = Matrix<float>.Build.Dense(inputCount, hiddenNeuronCount);
+                weights.Add(inputToHidden);
+            }
+            else if(i == hiddenLayerCount)
+            {
+                Matrix<float> hiddentoOutput = Matrix<float>.Build.Dense(hiddenNeuronCount, outputCount);
+                weights.Add(hiddentoOutput);
+            }
+            else
+            {
+                Matrix<float> hiddentoHidden = Matrix<float>.Build.Dense(hiddenNeuronCount, hiddenNeuronCount);
+                weights.Add(hiddentoHidden);
+            }
+        }
+
+        for (int i = 0; i < weights.Count; i++)
+        {
+            for(int x = 0; x < weights[i].RowCount; x++)
+            {
+                for(int y = 0; y < weights[i].ColumnCount; y++)
+                {
+                    weights[i][x,y] = 0f;
+                }
+            }
+        }
     }
 
-    void RandomiseWeights()
+    void RandomiseNetwork()
     {
         for (int i = 0; i < weights.Count; i++)
         {
@@ -73,6 +91,8 @@ public class NeuralNetwork
             }
         }
     }
+
+
 
 
     //would have to be changed for more inputs
@@ -168,7 +188,7 @@ public class NeuralNetwork
         hiddenLayers.Clear();
         outputLayer.Clear();
 
-        for(int i = 0; i < hiddenLayerCount + 1; i++)
+        for(int i = 0; i < hiddenLayerCount; i++)
         {
             Matrix<float> newHiddenLayer = Matrix<float>.Build.Dense(1, hiddenNeuronCount);
             hiddenLayers.Add(newHiddenLayer);

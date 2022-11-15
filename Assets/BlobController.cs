@@ -84,7 +84,7 @@ public class BlobController : MonoBehaviour
 
     void Move()
     {
-        Vector3 movementDirection = new Vector3(xInput, yInput, 0f);
+        Vector3 movementDirection = new Vector3(xInput * 2 - 1, yInput * 2 - 1, 0f);
         transform.position += movementDirection * Time.deltaTime * speed;
     }
 
@@ -97,6 +97,7 @@ public class BlobController : MonoBehaviour
             Debug.Log("hit food");
             overallFitness += fitnessPerFood;
             food.Eaten();
+            FindObjectOfType<BacteriaGeneticManager>().SpawnChild(network, transform.position);
         }
     }
 
@@ -104,7 +105,6 @@ public class BlobController : MonoBehaviour
     {
         if(network != null)
         {
-            FindObjectOfType<BacteriaGeneticManager>().Death(overallFitness, network, genome);
             Destroy(gameObject);
         }
         

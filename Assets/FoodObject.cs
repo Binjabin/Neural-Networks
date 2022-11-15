@@ -6,6 +6,6 @@ public class FoodObject : MonoBehaviour
 {
     public void Eaten()
     {
-        FindObjectOfType<FoodSpawner>().DeleteFood(this);
+        FindObjectOfType<BacteriaGeneticManager>().DeleteFood(this);
     }
 }

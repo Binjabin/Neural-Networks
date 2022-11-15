@@ -11,40 +11,15 @@ public class BacteriaGeneticManager : MonoBehaviour
 
     [Header("References")]
     public GameObject agentPrefab;
-    public Transform spawnPoint;
 
     [Header("Generation Settings")]
-    public int wavesPerGeneration = 10;
-    int wavesSoFar;
-    [Range(0, 80)] public int populationPerWave = 1;
-    int initialPopulation;
-    int spawnedSoFar;
+    public int initialPopulation;
     [Range(0f, 1f)] public float mutationRate = 0.055f;
-    public float delayBetweenGenerations;
-
-    [Header("Crossover Settings")]
-    public int maintainBestWithNoMutation = 1;
-    [Range(0f, 1f)] public float bestAgentSelectionProportion = 0.3f;
-    int bestAgentSelectionCount;
-    [Range(0f, 1f)] public float worstAgentSelectionProportion = 0.0f;
-    int worstAgentSelectionCount;
-    [Range(0f, 1f)] public float crossoverProportion = 0.6f;
-    int crossoverCount;
-
-    List<int> genePool = new List<int>();
-    int naturallySelected;
 
     NeuralNetwork[] population;
 
     [Header("Debug")]
-    public int currentGeneration;
     public int currentlyAlive;
-
-    [Header("UI")]
-    [SerializeField] TextMeshProUGUI generationCounterText;
-    [SerializeField] TextMeshProUGUI waveCounterText;
-    [SerializeField] TextMeshProUGUI highestFitnessText;
-    float highestFitness = 0f;
 
     [Header("Network Options")]
     public int LAYERS = 1;
@@ -53,62 +28,75 @@ public class BacteriaGeneticManager : MonoBehaviour
     public int OUTPUT_COUNT = 2;
     //TMProUGUI averageFitness;
 
-    FoodSpawner foodSpawner;
+    [Header("Food Options")]
+    [SerializeField] GameObject foodPrefab;
+    [SerializeField] int foodToSpawn = 100;
+    public List<FoodObject> foodList = new List<FoodObject>();
+    // Start is called before the first frame update
 
+    [Header("Area Options")]
+    [SerializeField] float maxDistanceFromCenter = 10f;
 
+    void SpawnFood()
+    {
+        GameObject foodObject = Instantiate(foodPrefab, GetRandomPosInArena(), Quaternion.identity);
+        foodObject.transform.parent = transform;
+        foodList.Add(foodObject.GetComponent<FoodObject>());
+    }
+    
+    public void DeleteFood(FoodObject food)
+    {
+        foodList.Remove(food);
+        Destroy(food.gameObject);
+        SpawnFood();
+    }
+
+    public void ClearFood()
+    {
+        for(int i = 0; i < foodList.Count; i++)
+        {
+            Destroy(foodList[i].gameObject);
+        }
+        foodList.Clear();
+    }
+
+    public void FillFood()
+    {
+        for(int i = 0; i < foodToSpawn; i++)
+        {
+            SpawnFood();
+        }
+    }
 
     void Start()
     {
-        if((bestAgentSelectionProportion + worstAgentSelectionProportion + crossoverProportion) > 1f){Debug.LogError("Repopulation proportion settings cannot add up to more than 1!");}
-
-        initialPopulation = wavesPerGeneration * populationPerWave;
-        bestAgentSelectionCount = Mathf.RoundToInt(bestAgentSelectionProportion * initialPopulation);
-        worstAgentSelectionCount = Mathf.RoundToInt(worstAgentSelectionProportion * initialPopulation);
-        crossoverCount = Mathf.RoundToInt(crossoverProportion * initialPopulation);
-
-        foodSpawner = FindObjectOfType<FoodSpawner>();
-    
-
         CreatePopulation();
-
+        FillFood();
     }
 
     void CreatePopulation()
     {
         population = new NeuralNetwork[initialPopulation];
         FillPopulationWithRandomValues(population, 0);
-        SpawnGeneration();
+        SpawnInitialPopulation();
     }
 
-
-
-    void SpawnWave()
+    void SpawnInitialPopulation()
     {
-        foodSpawner.ClearFood();
-        foodSpawner.FillFood();
-
-        wavesSoFar++;
-        currentlyAlive = populationPerWave;
-        for(int i = spawnedSoFar; i < populationPerWave * wavesSoFar; i++)
+        for(int i = 0; i < initialPopulation; i++)
         {
-            spawnedSoFar++;
-            GameObject newAgent = GameObject.Instantiate(agentPrefab, spawnPoint);
+            GameObject newAgent = GameObject.Instantiate(agentPrefab, GetRandomPosInArena(), Quaternion.identity);
             var newAgentController = newAgent.GetComponent<BlobController>();
             if(newAgentController != null)
             {
                 newAgentController.SpawnWithNetwork(population[i]);
-                newAgentController.genome = i;
             }
-
         }
-        UpdateUI();
     }
 
-    void SpawnGeneration()
+    Vector3 GetRandomPosInArena()
     {
-        wavesSoFar = 0;
-        spawnedSoFar = 0;
-        SpawnWave();
+        return new Vector3(Random.Range(-maxDistanceFromCenter, maxDistanceFromCenter), Random.Range(-maxDistanceFromCenter, maxDistanceFromCenter), 0f);
     }
 
     void FillPopulationWithRandomValues(NeuralNetwork[] newPopulation, int startingIndex)
@@ -121,176 +109,15 @@ public class BacteriaGeneticManager : MonoBehaviour
         }
     }
 
-    public void Death(float fitness, NeuralNetwork network, int populationIndex)
+
+    void Mutate(NeuralNetwork agentToMutate)
     {
-        currentlyAlive--;
-        if(currentlyAlive > 0)
-        {
-            population[populationIndex].fitness = fitness;
-            highestFitness = Mathf.Max(fitness, highestFitness);
-        }
-        else
-        {
-            if(wavesSoFar < wavesPerGeneration)
-            {
-                SpawnWave();
-            }
-            else
-            {
-                StartCoroutine(WaitForNextGeneration());
-            }
-        }
-    }
-
-    IEnumerator WaitForNextGeneration()
-    {
-        yield return new WaitForSeconds(delayBetweenGenerations);
-        Repopulate();
-    }
-
-    void UpdateUI()
-    {
-        generationCounterText.text = "Generation: " + currentGeneration;
-        waveCounterText.text = "Wave: " + wavesSoFar + "/" + wavesPerGeneration;
-        highestFitnessText.text = "Highest fitness: " + highestFitness;
-
-    }
-
-    void Repopulate()
-    {
-        genePool.Clear();
-        currentGeneration++;
-        naturallySelected = 0;
-        SortPopulation();
-
-
-        NeuralNetwork[] newPopulation = PickPopulation();
-
-        Crossover(newPopulation);
-        Mutate(newPopulation);
-
-        FillPopulationWithRandomValues(newPopulation, naturallySelected);
-
-        population = newPopulation;
         
-        SpawnGeneration();
-
-    }
-
-    NeuralNetwork[] PickPopulation()
-    {
-        NeuralNetwork[] newPopulation = new NeuralNetwork[initialPopulation];
-
-        for(int i = 0; i < bestAgentSelectionCount; i++)
+        for(int c = 0; c < agentToMutate.weights.Count; c++)
         {
-            
-            newPopulation[naturallySelected] = population[i].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            newPopulation[naturallySelected].fitness = 0f;
-
-            int numberOfThisNetwork = Mathf.RoundToInt(population[i].fitness) * 10;
-
-            for(int c = 0; c < numberOfThisNetwork; c++)
+            if(Random.Range(0.0f, 1.0f) < mutationRate)
             {
-                genePool.Add(i);
-            }
-            naturallySelected++;
-        }
-
-        for(int i = 0; i < worstAgentSelectionCount; i++)
-        {
-            int last = population.Length - 1;
-            last -= i;
-            newPopulation[naturallySelected] = population[last].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            newPopulation[naturallySelected].fitness = 0f;
-
-            int numberOfThisNetwork = Mathf.RoundToInt(population[last].fitness) * 10;
-            for(int c = 0; c < numberOfThisNetwork; c++)
-            {
-                genePool.Add(last);
-            }
-            naturallySelected++;
-        }
-
-        return newPopulation;
-    }
-
-    private void SortPopulation()
-    {
-        population = population.OrderByDescending(x => x.fitness).ToArray();
-    }
-
-    private void Crossover(NeuralNetwork[] newPopulation)
-    {
-        for(int i = 0; i < crossoverCount; i+=2)
-        {
-            int aIndex = i;
-            int bIndex = i+1;
-
-            if(genePool.Count >= 1)
-            {
-                aIndex = genePool[Random.Range(0, genePool.Count)];
-                bIndex = genePool[Random.Range(0, genePool.Count)];
-                while(aIndex != bIndex)
-                {
-                    bIndex = genePool[Random.Range(0, genePool.Count)];
-                }
-            }
-
-            NeuralNetwork child1 = new NeuralNetwork();
-            NeuralNetwork child2 = new NeuralNetwork();
-            child1.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            child2.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            child1.fitness = 0;
-            child2.fitness = 0;
-
-
-            //improve later mabye
-            for(int w = 0; w < child1.weights.Count; w++)
-            {
-                if(Random.Range(0.0f, 1.0f) < 0.5f)
-                {
-                    child1.weights[w] = population[aIndex].weights[w];
-                    child2.weights[w] = population[bIndex].weights[w];
-                }
-                else
-                {
-                    child1.weights[w] = population[bIndex].weights[w];
-                    child2.weights[w] = population[aIndex].weights[w];
-                }
-            }
-
-            for(int w = 0; w < child1.biases.Count; w++)
-            {
-                if(Random.Range(0.0f, 1.0f) < 0.5f)
-                {
-                    child1.biases[w] = population[aIndex].biases[w];
-                    child2.biases[w] = population[bIndex].biases[w];
-                }
-                else
-                {
-                    child1.biases[w] = population[bIndex].biases[w];
-                    child2.biases[w] = population[aIndex].biases[w];
-                }
-            }
-
-            newPopulation[naturallySelected] = child1;
-            naturallySelected++;
-            newPopulation[naturallySelected] = child2;
-            naturallySelected++;
-
-        }
-    }
-
-    void Mutate(NeuralNetwork[] newPopulation)
-    {
-        for(int i = maintainBestWithNoMutation; i < naturallySelected; i++)
-        {
-            for(int c = 0; c < newPopulation[i].weights.Count; c++)
-            {
-                if(Random.Range(0.0f, 1.0f) < mutationRate)
-                {
-                    newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
-                }
+                agentToMutate.weights[c] = MutateMatrix(agentToMutate.weights[c]);
             }
         }
     }
@@ -318,5 +145,16 @@ public class BacteriaGeneticManager : MonoBehaviour
 
 
         return inMatrix;
+    }
+
+    public void SpawnChild(NeuralNetwork net, Vector3 pos)
+    {
+        GameObject newAgent = GameObject.Instantiate(agentPrefab, pos, Quaternion.identity);
+        var newAgentController = newAgent.GetComponent<BlobController>();
+        if(newAgentController != null)
+        {
+            NeuralNetwork newNetwork = net.InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+            newAgentController.SpawnWithNetwork(newNetwork);
+        }
     }
 }

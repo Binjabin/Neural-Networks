@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+
 public class NeuralNetworkGraph : MonoBehaviour
 {
     public bool randomiseNetwork;
@@ -17,37 +18,49 @@ public class NeuralNetworkGraph : MonoBehaviour
     [Header("Visuals Options")]
     public float distanceBetweenNodes;
     public float distanceBetweenLayers;
-    public Gradient colorGradient;
+    public Gradient nodeGradient;
+    public Gradient weightGradient;
     public GameObject nodePrefab;
     public GameObject linePrefab;
 
 
     List<GameObject> graph = new List<GameObject>();
 
+    public List<float> inputValues = new List<float>();
+    List<float> currentInputValues = new List<float>();
 
+    
     private void Update()
     {
+
         if(randomiseNetwork)
         {
             randomiseNetwork = false;
-            network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-
-            List<float> input = new List<float>();
-            for (int i = 0; i < INPUT_COUNT; i++)
-            {
-                input.Add(1f);
-            }
-            network.RunNetwork(input);
-            ClearGraph();
-            RenderGraph();
+            NewGraph();
+            
         }
+        UpdateGraph();
+        
     }
 
-    private void Start()
+    private void Awake()
+    {
+        NewGraph();
+    }
+
+    void NewGraph()
     {
         network = new NeuralNetwork();
+        network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+        UpdateGraph();
     }
 
+    void UpdateGraph()
+    {
+        network.RunNetwork(inputValues);
+        ClearGraph();
+        RenderGraph();
+    }
 
     void RenderGraph()
     {
@@ -59,8 +72,9 @@ public class NeuralNetworkGraph : MonoBehaviour
             GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
             float value = network.inputLayer[0, i];
             newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-            newNode.GetComponent<SpriteRenderer>().color = GetColor(value);
+            newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
             newNode.transform.parent = transform;
+            newNode.transform.localPosition = pos;
             graph.Add(newNode);
         }
 
@@ -76,8 +90,9 @@ public class NeuralNetworkGraph : MonoBehaviour
                 GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
                 float value = network.hiddenLayers[i][0, j];
                 newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-                newNode.GetComponent<SpriteRenderer>().color = GetColor(value);
+                newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
                 newNode.transform.parent = transform;
+                newNode.transform.localPosition = pos;
                 graph.Add(newNode);
             }
         }
@@ -91,32 +106,37 @@ public class NeuralNetworkGraph : MonoBehaviour
             GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
             float value = network.outputLayer[0, i];
             newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-            newNode.GetComponent<SpriteRenderer>().color = GetColor(value);
+            newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
             newNode.transform.parent = transform;
+            newNode.transform.localPosition = pos;
             graph.Add(newNode);
         }
 
         //connections 
         for (int i = 0; i < network.weights.Count; i++)
         {
+            Debug.Log(network.weights.Count);
             //each layer
-            for (int x = 0; x < network.weights[i].ColumnCount; x++)
+            for (int x = 0; x < network.weights[i].RowCount; x++)
             {
                 //each column
-                for (int y = 0; y < network.weights[i].RowCount; y++)
+                for (int y = 0; y < network.weights[i].ColumnCount; y++)
                 {
                     //each row
+
                     int fromLayer = i;
                     int toLayer = i + 1;
                    
-                    Vector3 pos1 = new Vector3(fromLayer*distanceBetweenLayers, (x * distanceBetweenNodes) - (0.5f * network.weights[i].ColumnCount * distanceBetweenNodes),0);
-                    Vector3 pos2 = new Vector3(toLayer*distanceBetweenLayers, (y * distanceBetweenNodes) - (0.5f * network.weights[i].RowCount * distanceBetweenNodes),0);
+                    Vector3 pos1 = new Vector3(fromLayer*distanceBetweenLayers, (x * distanceBetweenNodes) - (0.5f * network.weights[i].RowCount * distanceBetweenNodes),0);
+                    Vector3 pos2 = new Vector3(toLayer*distanceBetweenLayers, (y * distanceBetweenNodes) - (0.5f * network.weights[i].ColumnCount * distanceBetweenNodes),0);
+                    Vector3 pos2Offset = pos2-pos1;
                     GameObject line = Instantiate(linePrefab, pos1, Quaternion.identity);
-                    line.GetComponent<LineRenderer>().SetPosition(0, pos1);
-                    line.GetComponent<LineRenderer>().SetPosition(1, pos2);
                     line.transform.parent = transform;
-                    line.GetComponent<LineRenderer>().startColor = GetColor(network.weights[i][x, y]);
-                    line.GetComponent<LineRenderer>().endColor = GetColor(network.weights[i][x, y]);
+                    line.GetComponent<LineRenderer>().SetPosition(0, transform.position + pos1);
+                    line.GetComponent<LineRenderer>().SetPosition(1, transform.position + pos2);
+                    line.GetComponent<LineRenderer>().startColor = GetWeightColor(network.weights[i][x, y]);
+                    line.GetComponent<LineRenderer>().endColor = GetWeightColor(network.weights[i][x, y]);
+                    graph.Add(line);
                 }
             }
         }
@@ -131,9 +151,15 @@ public class NeuralNetworkGraph : MonoBehaviour
         }
     }
 
-    Color GetColor(float value)
+    Color GetNodeColor(float value)
     {
         value = Mathf.Clamp(value, 0f, 1f);
-        return colorGradient.Evaluate(value);
+        return nodeGradient.Evaluate(value);
+    }
+
+    Color GetWeightColor(float value)
+    {
+        value = (value + 1)/2f;
+        return weightGradient.Evaluate(value);
     }
 }
