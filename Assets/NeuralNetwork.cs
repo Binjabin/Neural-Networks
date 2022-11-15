@@ -85,32 +85,42 @@ public class NeuralNetwork
             inputLayer[0, i] = inputValues[i];
         }
         
-        inputLayer = inputLayer.PointwiseTanh();
+        inputLayer = ActivationFunction(inputLayer);
         
-        hiddenLayers[0] = ((inputLayer * weights[0]) + biases[0]).PointwiseTanh();
+        hiddenLayers[0] = ActivationFunction((inputLayer * weights[0]) + biases[0]);
 
         for(int i = 1; i < hiddenLayers.Count; i++)
         {
-            hiddenLayers[i] = ((hiddenLayers[i-1] * weights[i]) + biases[i]).PointwiseTanh();
+            hiddenLayers[i] = ActivationFunction((hiddenLayers[i-1] * weights[i]) + biases[i]);
         }
 
 
-        outputLayer = ((hiddenLayers[ hiddenLayers.Count - 1] * weights[ weights.Count - 1]) + biases[ biases.Count - 1]).PointwiseTanh();
+        outputLayer = ActivationFunction((hiddenLayers[ hiddenLayers.Count - 1] * weights[ weights.Count - 1]) + biases[ biases.Count - 1]);
 
         //first is accel, second is steer
 
         outputValues.Clear();
         for(int i = 0; i < outputLayer.ColumnCount; i++)
         {
-            var outValue = Sigmoid(outputLayer[0,i]);
+            var outValue = ActivationFunction(outputLayer[0,i]);
             outputValues.Add(outValue);
         }
         return outputValues;
     }
 
-    private float Sigmoid(float s)
+    private float ActivationFunction(float s)
     {
-        return (1 / ( 1 + Mathf.Exp(-s)));
+        return (1 / (1 + Mathf.Exp(-s)));
+    }
+
+    private Matrix<float> ActivationFunction(Matrix<float> s)
+    {
+        //Matrix<float> exp = s * -1;
+        //exp = exp.PointwiseExp();
+        //exp = exp + 1;
+        //return 1 / exp;
+
+        return s.PointwiseMaximum(0);
     }
 
 
