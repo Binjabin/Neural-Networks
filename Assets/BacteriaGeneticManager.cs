@@ -35,7 +35,7 @@ public class BacteriaGeneticManager : MonoBehaviour
     // Start is called before the first frame update
 
     [Header("Area Options")]
-    [SerializeField] float maxDistanceFromCenter = 10f;
+    public float maxDistanceFromCenter = 10f;
 
     void SpawnFood()
     {
@@ -105,6 +105,7 @@ public class BacteriaGeneticManager : MonoBehaviour
         {
             newPopulation[startingIndex] = new NeuralNetwork();
             newPopulation[startingIndex].Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+            population[startingIndex].RandomiseNetwork();
             startingIndex++;
         }
     }
@@ -149,7 +150,7 @@ public class BacteriaGeneticManager : MonoBehaviour
 
     public void SpawnChild(NeuralNetwork net, Vector3 pos)
     {
-        GameObject newAgent = GameObject.Instantiate(agentPrefab, pos, Quaternion.identity);
+        GameObject newAgent = Instantiate(agentPrefab, pos, Quaternion.identity);
         var newAgentController = newAgent.GetComponent<BlobController>();
         if(newAgentController != null)
         {

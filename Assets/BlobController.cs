@@ -25,6 +25,8 @@ public class BlobController : MonoBehaviour
     NeuralNetwork network;
     public int genome;
 
+    BacteriaGeneticManager manager;
+
     void Start()
     {
         //look directions (8 directions around)
@@ -41,6 +43,7 @@ public class BlobController : MonoBehaviour
             sensorValues.Add(0f);
         }
         timeSinceStart = 0f;
+        manager = FindObjectOfType<BacteriaGeneticManager>();
     }
 
     // Update is called once per frame
@@ -55,8 +58,8 @@ public class BlobController : MonoBehaviour
         {
             outputValueList = network.RunNetwork(inputValueList);
 
-            xInput = 2 * outputValueList[0] - 1;
-            yInput = 2 * outputValueList[1] - 1; 
+            xInput = outputValueList[0];
+            yInput = outputValueList[1]; 
         }
 
         Move();
@@ -72,7 +75,7 @@ public class BlobController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(transform.position, directionsToLook[i], visionDistance, sensorLayerMask);
             if(hit.collider != null)
             {
-                sensorValues[i] = hit.distance/visionDistance;
+                sensorValues[i] = (visionDistance - hit.distance)/visionDistance;
                 Debug.DrawRay(transform.position, directionsToLook[i] * visionDistance, Color.red);
             }
             else
@@ -84,8 +87,25 @@ public class BlobController : MonoBehaviour
 
     void Move()
     {
-        Vector3 movementDirection = new Vector3(xInput * 2 - 1, yInput * 2 - 1, 0f);
+        Vector3 movementDirection = new Vector3(xInput, yInput, 0f);
         transform.position += movementDirection * Time.deltaTime * speed;
+
+        if (transform.position.x > manager.maxDistanceFromCenter)
+        {
+            transform.position -= new Vector3(2 * manager.maxDistanceFromCenter, 0f, 0f);
+        }
+        if (transform.position.x < -manager.maxDistanceFromCenter)
+        {
+            transform.position += new Vector3(2 * manager.maxDistanceFromCenter, 0f, 0f);
+        }
+        if (transform.position.y > manager.maxDistanceFromCenter)
+        {
+            transform.position -= new Vector3(0f, 2 * manager.maxDistanceFromCenter, 0f);
+        }
+        if (transform.position.y < -manager.maxDistanceFromCenter)
+        {
+            transform.position -= new Vector3(0f, 2 * manager.maxDistanceFromCenter, 0f);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision) 

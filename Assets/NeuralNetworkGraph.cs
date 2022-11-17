@@ -52,6 +52,7 @@ public class NeuralNetworkGraph : MonoBehaviour
     {
         network = new NeuralNetwork();
         network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+        network.RandomiseNetwork();
         UpdateGraph();
     }
 

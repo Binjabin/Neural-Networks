@@ -17,7 +17,7 @@ public class NeuralNetwork
 
     public List<Matrix<float>> weights = new List<Matrix<float>>();
 
-    public List<float> biases = new List<float>();
+    public List<Matrix<float>> biases = new List<Matrix<float>>();
 
     public float fitness;
 
@@ -26,7 +26,7 @@ public class NeuralNetwork
     
     public void Initialise(int hiddenLayerCount, int hiddenNeuronCount, int inputCount, int outputCount)
     {
-
+        
         hiddenLayers.Clear();
         weights.Clear();
         biases.Clear();
@@ -34,18 +34,25 @@ public class NeuralNetwork
 
         inputLayer = Matrix<float>.Build.Dense(1,inputCount);
         inputLayer.Clear();
-        biases.Add(0f);
+
+        //initialise biases list
+        for (int i = 0; i < hiddenLayerCount; i++)
+        {
+            biases.Add(Matrix<float>.Build.Dense(1, hiddenNeuronCount));
+        }
+        biases.Add(Matrix<float>.Build.Dense(1, outputCount));
+
 
         for (int i = 0; i < hiddenLayerCount; i++)
         {
             Matrix<float> f = Matrix<float>.Build.Dense(1, hiddenNeuronCount);
             hiddenLayers.Add(f);
-            biases.Add(0f);
+  
         }
 
         outputLayer = Matrix<float>.Build.Dense(1,outputCount);
         outputLayer.Clear();
-        biases.Add(0f);
+        
 
         for (int i = 0; i < hiddenLayerCount + 1; i++)
         {
@@ -78,18 +85,25 @@ public class NeuralNetwork
         }
     }
 
-    void RandomiseNetwork()
+    public void RandomiseNetwork()
     {
         for (int i = 0; i < weights.Count; i++)
         {
-            for(int x = 0; x < weights[i].RowCount; x++)
+            for (int x = 0; x < weights[i].RowCount; x++)
             {
-                for(int y = 0; y < weights[i].ColumnCount; y++)
+                for (int y = 0; y < weights[i].ColumnCount; y++)
                 {
-                    weights[i][x,y] = Random.Range(-1f, 1f);
+                    weights[i][x, y] = Random.Range(-1f, 1f);
                 }
             }
         }
+        for (int i = 0; i < weights.Count; i++)
+        {
+            for (int y = 0; y < biases.Count; y++)
+            {
+                biases[i][0, y] = Random.Range(-1f, 1f);
+            }
+        }    
     }
 
 
@@ -105,7 +119,7 @@ public class NeuralNetwork
             inputLayer[0, i] = inputValues[i];
         }
         
-        inputLayer = ActivationFunction(inputLayer);
+        //inputLayer = ActivationFunction(inputLayer);
         
         hiddenLayers[0] = ActivationFunction((inputLayer * weights[0]) + biases[0]);
 
@@ -130,7 +144,7 @@ public class NeuralNetwork
 
     private float ActivationFunction(float s)
     {
-        return (1 / (1 + Mathf.Exp(-s)));
+        return (float)Math.Tanh(3f*s);
     }
 
     private Matrix<float> ActivationFunction(Matrix<float> s)
@@ -140,10 +154,8 @@ public class NeuralNetwork
         //exp = exp + 1;
         //return 1 / exp;
 
-        return s.PointwiseMaximum(0);
+        return (s*3f).PointwiseTanh();
     }
-
-
 
 
 
@@ -166,10 +178,17 @@ public class NeuralNetwork
             newWeights.Add(currentWeight);
         }
 
-        List<float> newBiases = new List<float>();
+        List<Matrix<float>> newBiases = new List<Matrix<float>>();
         for(int i = 0; i < biases.Count; i++)
         {
-            newBiases.Add(biases[i]);
+            Matrix<float> currentBias = Matrix<float>.Build.Dense(1, biases[i].ColumnCount);
+
+            for (int y = 0; y < currentBias.ColumnCount; y++)
+            {
+                currentBias[0, y] = biases[i][0, y];
+            }
+
+            newBiases.Add(currentBias);
         }
 
         n.weights = newWeights;

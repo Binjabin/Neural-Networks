@@ -302,10 +302,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomiseNetwork: 0
-  LAYERS: 3
-  NEURONS: 5
-  INPUT_COUNT: 2
-  OUTPUT_COUNT: 4
+  LAYERS: 1
+  NEURONS: 10
+  INPUT_COUNT: 8
+  OUTPUT_COUNT: 2
   distanceBetweenNodes: 2
   distanceBetweenLayers: 3
   nodeGradient:
@@ -369,7 +369,13 @@ MonoBehaviour:
   nodePrefab: {fileID: 1033814518069738282, guid: b2ea116082362c24aa56c5b32caf6794, type: 3}
   linePrefab: {fileID: 1480538332534650237, guid: e92b056f3eb89724dbb33b3cb2060811, type: 3}
   inputValues:
-  - 1
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
+  - 0
   - 0
 --- !u!4 &1897047695
 Transform:
