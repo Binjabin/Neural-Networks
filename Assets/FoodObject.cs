@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class FoodObject : MonoBehaviour
 {
-    public void Eaten()
+    public bool isEaten = false;
+    public void TryEat(BlobController blob)
     {
-        FindObjectOfType<BacteriaGeneticManager>().DeleteFood(this);
+        if(!isEaten)
+        {
+            isEaten = true;
+            blob.Eat(gameObject);
+        }
+
     }
 }

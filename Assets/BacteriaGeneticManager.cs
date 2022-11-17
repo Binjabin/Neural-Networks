@@ -31,8 +31,10 @@ public class BacteriaGeneticManager : MonoBehaviour
     [Header("Food Options")]
     [SerializeField] GameObject foodPrefab;
     [SerializeField] int foodToSpawn = 100;
-    public List<FoodObject> foodList = new List<FoodObject>();
+    public List<GameObject> foodList = new List<GameObject>();
     // Start is called before the first frame update
+    float foodTimer;
+    [SerializeField] float foodRespawnSpeed;
 
     [Header("Area Options")]
     public float maxDistanceFromCenter = 10f;
@@ -41,21 +43,32 @@ public class BacteriaGeneticManager : MonoBehaviour
     {
         GameObject foodObject = Instantiate(foodPrefab, GetRandomPosInArena(), Quaternion.identity);
         foodObject.transform.parent = transform;
-        foodList.Add(foodObject.GetComponent<FoodObject>());
+        foodList.Add(foodObject);
+        foodTimer = 0f;
     }
-    
-    public void DeleteFood(FoodObject food)
+
+    private void Update()
+    {
+        foodTimer += Time.deltaTime;
+        if(foodTimer >= foodRespawnSpeed && foodList.Count < foodToSpawn)
+        {
+            SpawnFood();
+        }
+    }
+
+    public void DeleteFood(GameObject food)
     {
         foodList.Remove(food);
-        Destroy(food.gameObject);
-        SpawnFood();
+        Debug.Log("destroyed food");
+        Destroy(food);
+        //SpawnFood();
     }
 
     public void ClearFood()
     {
         for(int i = 0; i < foodList.Count; i++)
         {
-            Destroy(foodList[i].gameObject);
+            Destroy(foodList[i]);
         }
         foodList.Clear();
     }
@@ -89,7 +102,7 @@ public class BacteriaGeneticManager : MonoBehaviour
             var newAgentController = newAgent.GetComponent<BlobController>();
             if(newAgentController != null)
             {
-                newAgentController.SpawnWithNetwork(population[i]);
+                newAgentController.SpawnWithNetwork(population[i], true);
             }
         }
     }
@@ -155,7 +168,17 @@ public class BacteriaGeneticManager : MonoBehaviour
         if(newAgentController != null)
         {
             NeuralNetwork newNetwork = net.InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            newAgentController.SpawnWithNetwork(newNetwork);
+            float f = Random.Range(0.0f, 1.0f);
+            if(f<mutationRate)
+            {
+                Mutate(newNetwork);
+                newAgentController.SpawnWithNetwork(newNetwork, true);
+            }
+            else
+            {
+                newAgentController.SpawnWithNetwork(newNetwork, false);
+            }
+            
         }
     }
 }

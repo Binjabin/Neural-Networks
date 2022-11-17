@@ -11,12 +11,16 @@ public class BlobController : MonoBehaviour
     [SerializeField] LayerMask sensorLayerMask;
     [SerializeField] float xInput;
     [SerializeField] float yInput;
+    public float viewDirections;
 
     [Header("Fitness")]
-    public float overallFitness;
-    public float fitnessPerFood = 1f;
-    float timeSinceStart;
+    public float currentEnergy;
+    public float energyPerFood = 10f;
+    public float energyLossPerSecond = 1f;
+    public float energyToReproduce = 30f;
+    public float startingEnergy = 10f;
 
+    
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
     List<Vector3> directionsToLook = new List<Vector3>();
@@ -30,19 +34,18 @@ public class BlobController : MonoBehaviour
     void Start()
     {
         //look directions (8 directions around)
-        directionsToLook.Add(transform.up);
-        directionsToLook.Add(Vector3.Normalize(transform.up + transform.right));
-        directionsToLook.Add(transform.right);
-        directionsToLook.Add(Vector3.Normalize(-transform.up + transform.right));
-        directionsToLook.Add(-transform.up);
-        directionsToLook.Add(Vector3.Normalize(-transform.up - transform.right));
-        directionsToLook.Add(-transform.right);
-        directionsToLook.Add(Vector3.Normalize(transform.up - transform.right));
-        for(int i = 0; i < 8; i++)
+        currentEnergy = startingEnergy;
+        for(int i = 0; i < viewDirections; i++)
+        {
+            float thisAngle = i * (360 / viewDirections);
+            directionsToLook.Add(Quaternion.AngleAxis(thisAngle, new Vector3(0, 0, 1)) * new Vector3(1, 0, 0));
+        }
+        
+        
+        for (int i = 0; i < directionsToLook.Count; i++)
         {
             sensorValues.Add(0f);
         }
-        timeSinceStart = 0f;
         manager = FindObjectOfType<BacteriaGeneticManager>();
     }
 
@@ -63,7 +66,7 @@ public class BlobController : MonoBehaviour
         }
 
         Move();
-        timeSinceStart += Time.deltaTime;
+        currentEnergy -= energyLossPerSecond * Time.deltaTime;
         CalculateFitness();
     }
 
@@ -110,15 +113,18 @@ public class BlobController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision) 
     {
-        FoodObject food = collision.collider.gameObject.GetComponent<FoodObject>();
-        Debug.Log("hit food");
-        if(food != null)
+        GameObject food = collision.collider.gameObject;
+        if(food.GetComponent<FoodObject>() != null)
         {
-            Debug.Log("hit food");
-            overallFitness += fitnessPerFood;
-            food.Eaten();
-            FindObjectOfType<BacteriaGeneticManager>().SpawnChild(network, transform.position);
+            food.GetComponent<FoodObject>().TryEat(this);
         }
+    }
+
+    public void Eat(GameObject food)
+    {
+        Debug.Log("eaten food");
+        currentEnergy += energyPerFood;
+        FindObjectOfType<BacteriaGeneticManager>().DeleteFood(food);
     }
 
     private void Death()
@@ -130,16 +136,36 @@ public class BlobController : MonoBehaviour
         
     }
 
+    void MutateTraits()
+    {
+        visionDistance += Random.Range(-1f, 1f);
+        visionDistance = Mathf.Max(visionDistance, 0f);
+
+        speed += Random.Range(-0.5f, 0.5f);
+        speed = Mathf.Max(speed, 0f);
+
+    }
+
     void CalculateFitness()
     {
-        if (timeSinceStart > 10)
+        if (currentEnergy <= 0f)
         {
             Death();
         }
+        if(currentEnergy >= 30f)
+        {
+            currentEnergy -= 10f;
+            FindObjectOfType<BacteriaGeneticManager>().SpawnChild(network, transform.position);
+
+        }
     }
 
-    public void SpawnWithNetwork(NeuralNetwork net)
+    public void SpawnWithNetwork(NeuralNetwork net, bool mutateTraits)
     {
         network = net;
+        if(mutateTraits)
+        {
+            MutateTraits();
+        }
     }
 }

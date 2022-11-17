@@ -429,16 +429,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   agentPrefab: {fileID: 83228528826153689, guid: 2032c3d9ffa9fcc6589dd8c38d76194c, type: 3}
-  initialPopulation: 10
-  mutationRate: 0.055
+  initialPopulation: 5
+  mutationRate: 0.2
   currentlyAlive: 0
   LAYERS: 1
-  NEURONS: 10
-  INPUT_COUNT: 8
+  NEURONS: 20
+  INPUT_COUNT: 16
   OUTPUT_COUNT: 2
   foodPrefab: {fileID: 1872104602597706503, guid: ddd5093b2a65e3adabdf922f17335f6d, type: 3}
-  foodToSpawn: 50
+  foodToSpawn: 80
   foodList: []
+  foodRespawnSpeed: 0.3
   maxDistanceFromCenter: 10
 --- !u!4 &1325299760
 Transform:
