@@ -24,23 +24,24 @@ public class NeuralNetworkGraph : MonoBehaviour
     public GameObject linePrefab;
 
 
-    List<GameObject> graph = new List<GameObject>();
+    public GameObject[][] nodeObjects;
+    public GameObject[][][] weightObjects;
 
     public List<float> inputValues = new List<float>();
     List<float> currentInputValues = new List<float>();
 
-    
+
     private void Update()
     {
 
-        if(randomiseNetwork)
+        if (randomiseNetwork)
         {
             randomiseNetwork = false;
             NewGraph();
-            
+
         }
         UpdateGraph();
-        
+
     }
 
     private void Awake()
@@ -52,6 +53,7 @@ public class NeuralNetworkGraph : MonoBehaviour
     {
         network = new NeuralNetwork();
         network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+        InitialiseGraph();
         network.RandomiseNetwork();
         UpdateGraph();
     }
@@ -59,108 +61,200 @@ public class NeuralNetworkGraph : MonoBehaviour
     void UpdateGraph()
     {
         network.RunNetwork(inputValues);
-        ClearGraph();
         RenderGraph();
     }
 
-    void RenderGraph()
+    void InitialiseGraph()
     {
-        //nodes for input layer
-        for (int i = 0; i < INPUT_COUNT; i++)
+        //init nodes
+        nodeObjects = new GameObject[LAYERS + 2][];
+        for (int i = 0; i < LAYERS + 2; i++)
         {
-            float vert = (i * distanceBetweenNodes) - (0.5f * INPUT_COUNT * distanceBetweenNodes);
-            Vector3 pos = new Vector3(0f, vert, 0f);
-            GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
-            float value = network.inputLayer[0, i];
-            newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-            newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
-            newNode.transform.parent = transform;
-            newNode.transform.localPosition = pos;
-            graph.Add(newNode);
-        }
-
-        //nodes for hidden layers
-        for (int i = 0; i < LAYERS; i++)
-        {
-            //for each hidden layer
-            for (int j = 0; j < NEURONS; j++)
+            if (i == 0)
             {
-                float vert = (j * distanceBetweenNodes) - (0.5f * NEURONS * distanceBetweenNodes);
-                float hori = ((i + 1) * distanceBetweenLayers);
-                Vector3 pos = new Vector3(hori, vert, 0f);
-                GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
-                float value = network.hiddenLayers[i][0, j];
-                newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-                newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
-                newNode.transform.parent = transform;
-                newNode.transform.localPosition = pos;
-                graph.Add(newNode);
+                nodeObjects[i] = new GameObject[INPUT_COUNT];
+                for (int j = 0; j < INPUT_COUNT; j++)
+                {
+                    GameObject newNode = Instantiate(nodePrefab);
+                    newNode.transform.SetParent(transform, false);
+                    nodeObjects[i][j] = newNode;
+                }
+            }
+            else if (i == LAYERS + 1)
+            {
+                nodeObjects[i] = new GameObject[OUTPUT_COUNT];
+                for (int j = 0; j < OUTPUT_COUNT; j++)
+                {
+                    GameObject newNode = Instantiate(nodePrefab);
+                    newNode.transform.SetParent(transform, false);
+                    nodeObjects[i][j] = newNode;
+                }
+
+            }
+            else
+            {
+                nodeObjects[i] = new GameObject[NEURONS];
+                for (int j = 0; j < NEURONS; j++)
+                {
+                    GameObject newNode = Instantiate(nodePrefab);
+                    newNode.transform.SetParent(transform, false);
+                    nodeObjects[i][j] = newNode;
+                }
             }
         }
 
-        //nodes for output layer
-
-        for (int i = 0; i < OUTPUT_COUNT; i++)
+        //init weight lines
+        weightObjects = new GameObject[LAYERS + 1][][];
+        for (int i = 0; i < LAYERS + 1; i++)
         {
-            float vert = (i * distanceBetweenNodes) - (0.5f * OUTPUT_COUNT * distanceBetweenNodes);
-            Vector3 pos = new Vector3((LAYERS+1) * distanceBetweenLayers, vert, 0f);
-            GameObject newNode = Instantiate(nodePrefab, pos, Quaternion.identity);
-            float value = network.outputLayer[0, i];
-            newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
-            newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
-            newNode.transform.parent = transform;
-            newNode.transform.localPosition = pos;
-            graph.Add(newNode);
-        }
-
-        //connections 
-        for (int i = 0; i < network.weights.Count; i++)
-        {
-            Debug.Log(network.weights.Count);
-            //each layer
-            for (int x = 0; x < network.weights[i].RowCount; x++)
+            if (i == 0)
             {
-                //each column
-                for (int y = 0; y < network.weights[i].ColumnCount; y++)
+                weightObjects[i] = new GameObject[INPUT_COUNT][];
+                for (int j = 0; j < INPUT_COUNT; j++)
                 {
-                    //each row
-
-                    int fromLayer = i;
-                    int toLayer = i + 1;
-                   
-                    Vector3 pos1 = new Vector3(fromLayer*distanceBetweenLayers, (x * distanceBetweenNodes) - (0.5f * network.weights[i].RowCount * distanceBetweenNodes),0);
-                    Vector3 pos2 = new Vector3(toLayer*distanceBetweenLayers, (y * distanceBetweenNodes) - (0.5f * network.weights[i].ColumnCount * distanceBetweenNodes),0);
-                    Vector3 pos2Offset = pos2-pos1;
-                    GameObject line = Instantiate(linePrefab, pos1, Quaternion.identity);
-                    line.transform.parent = transform;
-                    line.GetComponent<LineRenderer>().SetPosition(0, transform.position + pos1);
-                    line.GetComponent<LineRenderer>().SetPosition(1, transform.position + pos2);
-                    line.GetComponent<LineRenderer>().startColor = GetWeightColor(network.weights[i][x, y]);
-                    line.GetComponent<LineRenderer>().endColor = GetWeightColor(network.weights[i][x, y]);
-                    graph.Add(line);
+                    weightObjects[i][j] = new GameObject[NEURONS];
+                    for (int k = 0; k < NEURONS; k++)
+                    {
+                        GameObject newLine = Instantiate(linePrefab);
+                        newLine.transform.SetParent(transform, false);
+                        weightObjects[i][j][k] = newLine;
+                    }
+                }
+            }
+            else if (i == LAYERS)
+            {
+                weightObjects[i] = new GameObject[NEURONS][];
+                for (int j = 0; j < NEURONS; j++)
+                {
+                    weightObjects[i][j] = new GameObject[OUTPUT_COUNT];
+                    for (int k = 0; k < OUTPUT_COUNT; k++)
+                    {
+                        GameObject newLine = Instantiate(linePrefab);
+                        weightObjects[i][j][k] = newLine;
+                        newLine.transform.SetParent(transform, false);
+                    }
+                }
+            }
+            else
+            {
+                weightObjects[i] = new GameObject[NEURONS][];
+                for (int j = 0; j < NEURONS; j++)
+                {
+                    weightObjects[i][j] = new GameObject[NEURONS];
+                    for (int k = 0; k < NEURONS; k++)
+                    {
+                        GameObject newLine = Instantiate(linePrefab);
+                        weightObjects[i][j][k] = newLine;
+                        newLine.transform.SetParent(transform, false);
+                    }
                 }
             }
         }
 
     }
 
+    void RenderGraph()
+    {
+        for (int i = 0; i < nodeObjects.Length; i++)
+        {
+            for (int j = 0; j < nodeObjects[i].Length; j++)
+            {
+                float vertical = (j * distanceBetweenNodes) - (0.5f * nodeObjects[i].Length * distanceBetweenNodes);
+                float horizontal = (i * distanceBetweenLayers);
+                Vector3 pos = new Vector3(horizontal, vertical, 0f);
+                GameObject newNode = nodeObjects[i][j];
+                newNode.transform.localPosition = pos;
+
+                float value = GetNodeValue(i, j);
+                
+
+
+                newNode.GetComponentInChildren<TextMeshProUGUI>().text = "" + value;
+                newNode.GetComponent<SpriteRenderer>().color = GetNodeColor(value);
+            }
+        }
+        for (int i = 0; i < weightObjects.Length; i++)
+        {
+            for (int j = 0; j < weightObjects[i].Length; j++)
+            {
+                for (int k = 0; k < weightObjects[i][j].Length; k++)
+                {
+                    int fromLayer = i;
+                    int toLayer = i + 1;
+
+                    Vector3 pos1 = new Vector3(fromLayer * distanceBetweenLayers, (j * distanceBetweenNodes) - (0.5f * network.weights[i].RowCount * distanceBetweenNodes), 0);
+                    Vector3 pos2 = new Vector3(toLayer * distanceBetweenLayers, (k * distanceBetweenNodes) - (0.5f * network.weights[i].ColumnCount * distanceBetweenNodes), 0);
+                    Vector3 pos2Offset = pos2 - pos1;
+                    GameObject line = weightObjects[i][j][k];
+                    line.transform.position = pos1;
+                    line.transform.SetParent(transform, false);
+                    line.GetComponent<LineRenderer>().SetPosition(0, transform.position + pos1);
+                    line.GetComponent<LineRenderer>().SetPosition(1, transform.position + pos2);
+                    line.GetComponent<LineRenderer>().startColor = GetWeightColor(network.weights[i][j, k]);
+                    line.GetComponent<LineRenderer>().endColor = GetWeightColor(network.weights[i][j, k]);
+
+                }
+            }
+        }
+
+    }
+
+    float GetNodeValue(int fromLayer, int node)
+    {
+        float unrounded;
+        if (fromLayer == 0)
+        {
+            unrounded = network.inputLayer[0, node];
+        }
+        else if (fromLayer == nodeObjects.Length - 1)
+        {
+            unrounded = network.outputLayer[0, node];
+        }
+        else
+        {
+            unrounded = network.hiddenLayers[fromLayer - 1][0, node];
+        }
+        float rounded = Mathf.Round(100 * unrounded) / 100;
+        return rounded;
+    }
+
     void ClearGraph()
     {
-        for (int i = 0; i < graph.Count; i++)
+        //clear nodes
+        for (int i = 0; i < nodeObjects.Length; i++)
         {
-            Destroy(graph[i]);
+            for (int j = 0; j < nodeObjects[i].Length; j++)
+            {
+                Destroy(nodeObjects[i][j]);
+            }
+
         }
+
+        for (int i = 0; i < weightObjects.Length; i++)
+        {
+            for (int j = 0; j < weightObjects[i].Length; j++)
+            {
+                for (int k = 0; k < weightObjects[i][j].Length; k++)
+                {
+                    Destroy(weightObjects[i][j][k]);
+                }
+            }
+        }
+
+        //clear weights
     }
 
     Color GetNodeColor(float value)
     {
-        value = Mathf.Clamp(value, 0f, 1f);
+        value = (value + 1) / 2f;
         return nodeGradient.Evaluate(value);
     }
 
     Color GetWeightColor(float value)
     {
-        value = (value + 1)/2f;
+        value = (value + 1) / 2f;
         return weightGradient.Evaluate(value);
     }
 }
+
+
