@@ -16,8 +16,11 @@ public class NeuralNetworkGraph : MonoBehaviour
     public int OUTPUT_COUNT = 2;
 
     [Header("Visuals Options")]
-    public float distanceBetweenNodes;
-    public float distanceBetweenLayers;
+    public float graphHeight;
+    float distanceBetweenNodes;
+    public float graphWidth;
+    float distanceBetweenLayers;
+    public float nodeSize;
     public Gradient nodeGradient;
     public Gradient weightGradient;
     public GameObject nodePrefab;
@@ -27,7 +30,7 @@ public class NeuralNetworkGraph : MonoBehaviour
     public GameObject[][] nodeObjects;
     public GameObject[][][] weightObjects;
 
-    public List<float> inputValues = new List<float>();
+    [Range(-1f, 1f)] public List<float> inputValues = new List<float>();
     List<float> currentInputValues = new List<float>();
 
 
@@ -159,12 +162,14 @@ public class NeuralNetworkGraph : MonoBehaviour
         {
             for (int j = 0; j < nodeObjects[i].Length; j++)
             {
-                float vertical = (j * distanceBetweenNodes) - (0.5f * nodeObjects[i].Length * distanceBetweenNodes);
-                float horizontal = (i * distanceBetweenLayers);
+                distanceBetweenNodes = graphHeight / (nodeObjects[i].Length + 1);
+                float vertical = (graphHeight / 2) - ((j+1) * distanceBetweenNodes);
+                distanceBetweenLayers = graphWidth / (nodeObjects.Length + 1);
+                float horizontal = ((i + 1) * distanceBetweenLayers) - (graphWidth / 2);
                 Vector3 pos = new Vector3(horizontal, vertical, 0f);
                 GameObject newNode = nodeObjects[i][j];
                 newNode.transform.localPosition = pos;
-
+                newNode.transform.localScale = new Vector3(nodeSize, nodeSize, 1);
                 float value = GetNodeValue(i, j);
                 
 
@@ -179,12 +184,16 @@ public class NeuralNetworkGraph : MonoBehaviour
             {
                 for (int k = 0; k < weightObjects[i][j].Length; k++)
                 {
-                    int fromLayer = i;
-                    int toLayer = i + 1;
+                    distanceBetweenNodes = graphHeight / (weightObjects[i].Length + 1);
+                    float vertical1 = (graphHeight / 2) - ((j + 1) * distanceBetweenNodes);
+                    distanceBetweenNodes = graphHeight / (weightObjects[i][j].Length + 1);
+                    float vertical2 = (graphHeight / 2) - ((k + 1) * distanceBetweenNodes);
+                    distanceBetweenLayers = graphWidth / (weightObjects.Length + 2);
+                    float horizontal1 = ((i + 1) * distanceBetweenLayers) - (graphWidth / 2);
+                    float horizontal2 = ((i + 2) * distanceBetweenLayers) - (graphWidth / 2) ;
 
-                    Vector3 pos1 = new Vector3(fromLayer * distanceBetweenLayers, (j * distanceBetweenNodes) - (0.5f * network.weights[i].RowCount * distanceBetweenNodes), 0);
-                    Vector3 pos2 = new Vector3(toLayer * distanceBetweenLayers, (k * distanceBetweenNodes) - (0.5f * network.weights[i].ColumnCount * distanceBetweenNodes), 0);
-                    Vector3 pos2Offset = pos2 - pos1;
+                    Vector3 pos1 = new Vector3(horizontal1, vertical1, 0);
+                    Vector3 pos2 = new Vector3(horizontal2, vertical2, 0);
                     GameObject line = weightObjects[i][j][k];
                     line.transform.position = pos1;
                     line.transform.SetParent(transform, false);

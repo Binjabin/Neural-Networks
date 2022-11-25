@@ -159,7 +159,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 1, g: 1, b: 1, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -302,29 +302,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomiseNetwork: 0
-  LAYERS: 1
-  NEURONS: 4
+  LAYERS: 2
+  NEURONS: 5
   INPUT_COUNT: 3
-  OUTPUT_COUNT: 3
-  distanceBetweenNodes: 2
-  distanceBetweenLayers: 3
+  OUTPUT_COUNT: 2
+  graphHeight: 10
+  graphWidth: 10
+  nodeSize: 1
   nodeGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
-    key1: {r: 0, g: 0, b: 0, a: 1}
-    key2: {r: 0.33456242, g: 1, b: 0, a: 1}
+    key1: {r: 0.19607843, g: 0, b: 0, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 1}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0.19607843, b: 0, a: 0}
+    key6: {r: 0, g: 1, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 33153
-    ctime2: 65535
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
+    ctime1: 22937
+    ctime2: 26214
+    ctime3: 33153
+    ctime4: 39321
+    ctime5: 42598
+    ctime6: 65535
     ctime7: 0
     atime0: 0
     atime1: 33539
@@ -335,28 +336,28 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 3
+    m_NumColorKeys: 7
     m_NumAlphaKeys: 3
   weightGradient:
     serializedVersion: 2
     key0: {r: 1, g: 0, b: 0, a: 1}
-    key1: {r: 0, g: 0, b: 0, a: 1}
-    key2: {r: 0, g: 1, b: 0.18730927, a: 1}
+    key1: {r: 0.19607843, g: 0, b: 0, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 1}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0.19607843, b: 0, a: 0}
+    key6: {r: 0, g: 1, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 32768
-    ctime2: 65535
-    ctime3: 0
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
+    ctime1: 22937
+    ctime2: 26214
+    ctime3: 33153
+    ctime4: 39321
+    ctime5: 42598
+    ctime6: 65535
     ctime7: 0
     atime0: 0
-    atime1: 65535
+    atime1: 33539
     atime2: 65535
     atime3: 0
     atime4: 0
@@ -364,8 +365,8 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 3
-    m_NumAlphaKeys: 2
+    m_NumColorKeys: 7
+    m_NumAlphaKeys: 3
   nodePrefab: {fileID: 1033814518069738282, guid: b2ea116082362c24aa56c5b32caf6794, type: 3}
   linePrefab: {fileID: 1480538332534650237, guid: e92b056f3eb89724dbb33b3cb2060811, type: 3}
   inputValues:
@@ -380,7 +381,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897047693}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

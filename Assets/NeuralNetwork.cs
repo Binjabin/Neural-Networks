@@ -99,7 +99,7 @@ public class NeuralNetwork
         }
         for (int i = 0; i < weights.Count; i++)
         {
-            for (int y = 0; y < biases.Count; y++)
+            for (int y = 0; y < weights[i].ColumnCount; y++)
             {
                 biases[i][0, y] = Random.Range(-1f, 1f);
             }
@@ -144,7 +144,7 @@ public class NeuralNetwork
 
     private float ActivationFunction(float s)
     {
-        return (float)Math.Tanh(3f*s);
+        return (float)Math.Tanh(s);
     }
 
     private Matrix<float> ActivationFunction(Matrix<float> s)

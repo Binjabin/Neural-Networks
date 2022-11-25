@@ -7,14 +7,22 @@ public class BugController : MonoBehaviour
 {
     Vector3 startPosition, startRotation;
     NeuralNetwork network;
+
+    [Header("Car Settings")]
     public float visionDistance = 5f;
 
-    [Range(-1f, 1f)] 
-    public float acceleration, turning;
+    public float driftFactor = 0.95f;
+    public float accelerationFactor = 30f;
+    public float turnFactor = 3.5f;
+    [Range(-1f, 1f)] public float accelerationInput, turningInput;
+
+    float rotationAngle;
+    Rigidbody2D rb;
+
     
-    public float timeSinceStart = 0f;
 
     [Header("Fitness")]
+    public float timeSinceStart = 0f;
     public float overallFitness;
     public float distanceMultiplier = 1.4f;
     public float averageSpeedMultiplier = 0.2f;
@@ -25,7 +33,7 @@ public class BugController : MonoBehaviour
     float averageSpeed;
 
     public LayerMask sensorLayerMask;
-    float aSensor, bSensor, cSensor;
+    [SerializeField, Range(0f, 1f)]float aSensor, bSensor, cSensor;
 
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
@@ -36,8 +44,8 @@ public class BugController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        startPosition = transform.position;
-        startRotation = transform.eulerAngles;
+        rb = GetComponent<Rigidbody2D>();
+        rotationAngle = transform.eulerAngles.z;
 
 
         //test code
@@ -87,39 +95,40 @@ public class BugController : MonoBehaviour
         RaycastHit2D aHit = Physics2D.Raycast(transform.position, aDirection, visionDistance, sensorLayerMask);
         if(aHit.collider != null)
         {
-            aSensor = aHit.distance/visionDistance;
+            aSensor = 1 - (aHit.distance/visionDistance);
             Debug.DrawRay(transform.position, aDirection * visionDistance, Color.red);
             //Debug.Log("A:" + aSensor);
         }
         else
         {
-            aSensor = 1f;
+            aSensor = 0f;
         }
 
         RaycastHit2D bHit = Physics2D.Raycast(transform.position, bDirection, visionDistance, sensorLayerMask);
         if(bHit.collider != null)
         {
-            bSensor = bHit.distance/visionDistance;
+            bSensor = 1 - (bHit.distance/visionDistance);
             Debug.DrawRay(transform.position, bDirection * visionDistance, Color.red);
             //Debug.Log("B:" + bSensor + " " + bHit.collider.gameObject);
         }
         else
         {
-            bSensor = 1f;
+            bSensor = 0f;
         }
 
         RaycastHit2D cHit = Physics2D.Raycast(transform.position, cDirection, visionDistance, sensorLayerMask);
         if(cHit.collider != null)
         {
-            cSensor = cHit.distance/visionDistance;
+            cSensor = 1 - (cHit.distance/visionDistance);
             Debug.DrawRay(transform.position, cDirection * visionDistance, Color.red);
             //Debug.Log("C:" + cSensor);
         }
         else
         {
-            cSensor = 1f;
+            cSensor = 0f;
         }
 
+        
 
     }
 
@@ -143,16 +152,24 @@ public class BugController : MonoBehaviour
     }
 
     Vector3 input;
-    public void MoveCar(float inputAcceleration, float inputRotation)
+    public void MoveCar()
     {
-        //tweak this to make more sense later
-        Vector3 positionLerpTarget = new Vector3(0f, inputAcceleration * visionDistance, 0f);
-        input = Vector3.Lerp(Vector3.zero, positionLerpTarget, 0.1f);
-        input = transform.TransformDirection(input);
-        transform.position += input;
+        //forward engine
+        Vector2 engineForceVector = transform.up * accelerationInput * accelerationFactor;
+        rb.AddForce(engineForceVector, ForceMode2D.Force);
 
-        float newRotation = Mathf.Lerp(0f, inputRotation*90f, 0.05f);
-        transform.eulerAngles += new Vector3(0f, 0f, newRotation);
+
+        //drift
+        Vector2 forwardVelocity = transform.up * Vector2.Dot(rb.velocity, transform.up);
+        Vector2 rightVelocity = transform.right * Vector2.Dot(rb.velocity, transform.right);
+        rb.velocity = forwardVelocity + rightVelocity * driftFactor;
+
+        //turning
+        float minSpeedForTurnFactor = rb.velocity.magnitude / 8;
+        minSpeedForTurnFactor = Mathf.Clamp01(minSpeedForTurnFactor);
+        rotationAngle -= turningInput * turnFactor * minSpeedForTurnFactor;
+        rb.MoveRotation(rotationAngle);
+
 
     }
 
@@ -177,13 +194,13 @@ public class BugController : MonoBehaviour
         if(network != null)
         {
             outputValueList = network.RunNetwork(inputValueList);
-            acceleration = outputValueList[0];
-            turning = outputValueList[1];
+            accelerationInput = (outputValueList[0] + 1 )/ 2;
+            turningInput = outputValueList[1];
         }
         
         
 
-        MoveCar(acceleration, turning);
+        MoveCar();
 
         timeSinceStart += Time.deltaTime;
         CalculateFitness();

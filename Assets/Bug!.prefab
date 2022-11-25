@@ -80,7 +80,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 0
 --- !u!114 &4090908080971068321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,20 +94,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visionDistance: 10
-  acceleration: 0
-  turning: 0
+  driftFactor: 0.85
+  accelerationFactor: 25
+  turnFactor: 3.5
+  accelerationInput: 0
+  turningInput: 0
   timeSinceStart: 0
   overallFitness: 0
   distanceMultiplier: 1.4
-  averageSpeedMultiplier: 0.3
+  averageSpeedMultiplier: 0.2
   sensorMultiplier: 0
   sensorLayerMask:
     serializedVersion: 2
     m_Bits: 1
-  LAYERS: 2
-  NEURONS: 10
-  INPUT_COUNT: 3
-  OUTPUT_COUNT: 2
+  aSensor: 0
+  bSensor: 0
+  cSensor: 0
   genome: 0
 --- !u!1 &4090908081112225933
 GameObject:

@@ -108,6 +108,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         {
             newPopulation[startingIndex] = new NeuralNetwork();
             newPopulation[startingIndex].Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+            newPopulation[startingIndex].RandomiseNetwork();
             startingIndex++;
         }
     }

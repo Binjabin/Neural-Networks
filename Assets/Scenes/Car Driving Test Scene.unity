@@ -400,7 +400,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 295758038}
-  - component: {fileID: 295758037}
   - component: {fileID: 295758039}
   m_Layer: 0
   m_Name: Generation
@@ -409,26 +408,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &295758037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 295758036}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c20178755ef75e2e87bdd10481c6398, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 0}
-  initialPopulation: 85
-  mutationRate: 0.055
-  bestAgentSelectionCount: 20
-  worstAgentSelectionCount: 0
-  numberToCrossover: 60
-  currentGeneration: 0
-  currentGenome: 0
 --- !u!4 &295758038
 Transform:
   m_ObjectHideFlags: 0
@@ -470,6 +449,10 @@ MonoBehaviour:
   generationCounterText: {fileID: 927082352}
   waveCounterText: {fileID: 205926539}
   highestFitnessText: {fileID: 241253566}
+  LAYERS: 2
+  NEURONS: 5
+  INPUT_COUNT: 3
+  OUTPUT_COUNT: 2
 --- !u!1 &477780618
 GameObject:
   m_ObjectHideFlags: 0
