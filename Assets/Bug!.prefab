@@ -95,7 +95,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   visionDistance: 10
   driftFactor: 0.85
-  accelerationFactor: 25
+  accelerationFactor: 30
   turnFactor: 3.5
   accelerationInput: 0
   turningInput: 0

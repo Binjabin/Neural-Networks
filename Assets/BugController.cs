@@ -7,6 +7,8 @@ public class BugController : MonoBehaviour
 {
     Vector3 startPosition, startRotation;
     NeuralNetwork network;
+    ClosestPoint progressTracker;
+    int progressIndex;
 
     [Header("Car Settings")]
     public float visionDistance = 5f;
@@ -46,11 +48,16 @@ public class BugController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         rotationAngle = transform.eulerAngles.z;
-
+        progressTracker = FindObjectOfType<ClosestPoint>();
 
         //test code
         //network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
 
+    }
+
+    private void Start()
+    {
+        progressIndex = progressTracker.InitProgress(transform.position);
     }
 
     void Reset()
@@ -148,7 +155,7 @@ public class BugController : MonoBehaviour
             //save network to json
             Death();
         }
-
+        progressIndex = progressTracker.GetProgress(transform.position, progressIndex);
     }
 
     Vector3 input;
@@ -175,9 +182,6 @@ public class BugController : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(transform.position, Vector3.Normalize(transform.up + transform.right));
-        Debug.DrawRay(transform.position, transform.up);
-        Debug.DrawRay(transform.position, Vector3.Normalize(transform.up - transform.right));
     }
 
     private void FixedUpdate() 
