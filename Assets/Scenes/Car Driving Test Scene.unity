@@ -436,14 +436,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bugPrefab: {fileID: 4090908080971068325, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
   spawnPoint: {fileID: 477780619}
-  wavesPerGeneration: 3
-  populationPerWave: 60
-  mutationRate: 0.055
+  wavesPerGeneration: 1
+  populationPerWave: 80
   delayBetweenGenerations: 2
-  maintainBestWithNoMutation: 1
-  bestAgentSelectionProportion: 0.3
-  worstAgentSelectionProportion: 0
-  crossoverProportion: 0.6
+  numberOfParents: 5
+  mutationRate: 0.13
   currentGeneration: 0
   currentlyAlive: 0
   generationCounterText: {fileID: 927082352}
@@ -519,7 +516,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 0}
+  m_BackGroundColor: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1483,7 +1480,7 @@ SpriteShapeRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -1895,7 +1892,7 @@ SpriteShapeRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -2489,7 +2486,7 @@ SpriteShapeRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1

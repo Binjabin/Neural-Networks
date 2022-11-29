@@ -43,13 +43,19 @@ public class BugController : MonoBehaviour
     public int genome;
     bool isMultiSpawned;
 
+    [Header("Visuals")]
+    public bool isParentOfGeneration;
+    SpriteRenderer renderer;
+    [SerializeField] Color parentColor;
+    [SerializeField] Color standardColor;
+
     // Start is called before the first frame update
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rotationAngle = transform.eulerAngles.z;
         progressTracker = FindObjectOfType<ClosestPoint>();
-
+        renderer = GetComponentInChildren<SpriteRenderer>();
         //test code
         //network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
 
@@ -151,13 +157,12 @@ public class BugController : MonoBehaviour
 
         if (timeSinceStart > 30)
         {
-            //save network to json
+            //time limit
             Death();
         }
         int newProgress = progressTracker.GetProgress(transform.position, currentProgressIndex);
         if (newProgress != currentProgressIndex)
         {
-            Debug.Log("Made progress: " + Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3));
             totalDistanceTravelled += Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3);
 
             currentProgressIndex = newProgress;
@@ -210,6 +215,14 @@ public class BugController : MonoBehaviour
             outputValueList = network.RunNetwork(inputValueList);
             accelerationInput = outputValueList[0];
             turningInput = outputValueList[1];
+            if(isParentOfGeneration)
+            {
+                renderer.color = parentColor;
+            }
+            else
+            {
+                renderer.color = standardColor;
+            }
         }
         
         

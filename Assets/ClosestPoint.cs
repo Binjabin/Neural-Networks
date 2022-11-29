@@ -23,16 +23,25 @@ public class ClosestPoint : MonoBehaviour
         Debug.DrawLine(carPos, closestPoint, Color.yellow);
         int outIndex = GetClosestPoint(closestPoint);
 
-        
-
         if (outIndex > mostRecentPoint)
         {
-            return outIndex;
+
+            if (outIndex - mostRecentPoint > 3)
+            {
+                //prevent cheating AIs
+                Debug.Log("Skipped more than 3 steps!");
+                return mostRecentPoint;
+                
+            }
+            else
+            {
+                return outIndex;
+            }
+            
         }
         //check if you were near the end last check, and is now near the begining
         else if (mostRecentPoint > lastPoint - 3 && outIndex < 3)
         {
-            Debug.Log("Looped around!");
             return outIndex;
         }
         else

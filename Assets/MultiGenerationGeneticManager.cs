@@ -17,17 +17,12 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     [Range(0, 80)] public int populationPerWave = 50;
     int initialPopulation;
     int spawnedSoFar;
-    [Range(0f, 1f)] public float mutationRate = 0.055f;
+    
     public float delayBetweenGenerations;
 
     [Header("Crossover Settings")]
-    public int maintainBestWithNoMutation = 1;
-    [Range(0f, 1f)] public float bestAgentSelectionProportion = 0.3f;
-    int bestAgentSelectionCount;
-    [Range(0f, 1f)] public float worstAgentSelectionProportion = 0.0f;
-    int worstAgentSelectionCount;
-    [Range(0f, 1f)] public float crossoverProportion = 0.6f;
-    int crossoverCount;
+    [Range(2f, 100f)] public int numberOfParents = 1;
+    [Range(0f, 1f)] public float mutationRate = 0.055f;
 
     List<int> genePool = new List<int>();
     int naturallySelected;
@@ -57,13 +52,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
     void Start()
     {
-        if((bestAgentSelectionProportion + worstAgentSelectionProportion + crossoverProportion) > 1f){Debug.LogError("Repopulation proportion settings cannot add up to more than 1!");}
-
         initialPopulation = wavesPerGeneration * populationPerWave;
-        bestAgentSelectionCount = Mathf.RoundToInt(bestAgentSelectionProportion * initialPopulation);
-        worstAgentSelectionCount = Mathf.RoundToInt(worstAgentSelectionProportion * initialPopulation);
-        crossoverCount = Mathf.RoundToInt(crossoverProportion * initialPopulation);
-
         CreatePopulation();
     }
 
@@ -84,11 +73,16 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         {
             spawnedSoFar++;
             GameObject newBug = GameObject.Instantiate(bugPrefab, spawnPoint);
+            
             var newBugController = newBug.GetComponent<BugController>();
             if(newBugController != null)
             {
                 newBugController.SpawnWithNetwork(population[i]);
                 newBugController.genome = i;
+                if (i < numberOfParents)
+                {
+                    newBugController.isParentOfGeneration = true;
+                }
             }
 
         }
@@ -119,7 +113,14 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         if(currentlyAlive > 0)
         {
             population[populationIndex].fitness = fitness;
-            highestFitness = Mathf.Max(fitness, highestFitness);
+            if(fitness > highestFitness)
+            {
+                Debug.Log("Set new highest:" + fitness);
+                highestFitness = fitness;
+            }
+           
+
+            
         }
         else
         {
@@ -161,7 +162,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         Crossover(newPopulation);
         Mutate(newPopulation);
 
-        FillPopulationWithRandomValues(newPopulation, naturallySelected);
+        //FillPopulationWithRandomValues(newPopulation, naturallySelected);
 
         population = newPopulation;
         
@@ -173,7 +174,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     {
         NeuralNetwork[] newPopulation = new NeuralNetwork[initialPopulation];
 
-        for(int i = 0; i < bestAgentSelectionCount; i++)
+        for(int i = 0; i < numberOfParents; i++)
         {
             
             newPopulation[naturallySelected] = population[i].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
@@ -188,21 +189,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             naturallySelected++;
         }
 
-        for(int i = 0; i < worstAgentSelectionCount; i++)
-        {
-            int last = population.Length - 1;
-            last -= i;
-            newPopulation[naturallySelected] = population[last].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            newPopulation[naturallySelected].fitness = 0f;
-
-            int numberOfThisNetwork = Mathf.RoundToInt(population[last].fitness) * 10;
-            for(int c = 0; c < numberOfThisNetwork; c++)
-            {
-                genePool.Add(last);
-            }
-            naturallySelected++;
-        }
-
         return newPopulation;
     }
 
@@ -213,61 +199,52 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
     private void Crossover(NeuralNetwork[] newPopulation)
     {
-        for(int i = 0; i < crossoverCount; i+=2)
+        for(int i = numberOfParents; i < initialPopulation; i+=1)
         {
-            int aIndex = i;
-            int bIndex = i+1;
+
+            int aParentIndex = 0;
+            int bParentIndex = 0;
 
             if(genePool.Count >= 1)
             {
-                aIndex = genePool[Random.Range(0, genePool.Count)];
-                bIndex = genePool[Random.Range(0, genePool.Count)];
-                while(aIndex != bIndex)
+                aParentIndex = genePool[Random.Range(0, genePool.Count)];
+                bParentIndex = genePool[Random.Range(0, genePool.Count)];
+                while(aParentIndex == bParentIndex)
                 {
-                    bIndex = genePool[Random.Range(0, genePool.Count)];
+                    bParentIndex = genePool[Random.Range(0, genePool.Count)];
                 }
             }
 
-            NeuralNetwork child1 = new NeuralNetwork();
-            NeuralNetwork child2 = new NeuralNetwork();
-            child1.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            child2.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-            child1.fitness = 0;
-            child2.fitness = 0;
+            NeuralNetwork child = new NeuralNetwork();
+            child.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
+            child.fitness = 0;
 
-
-            //improve later mabye
-            for(int w = 0; w < child1.weights.Count; w++)
+            //improve later to randomise individual weights, not just sets of weights
+            for(int w = 0; w < child.weights.Count; w++)
             {
                 if(Random.Range(0.0f, 1.0f) < 0.5f)
                 {
-                    child1.weights[w] = population[aIndex].weights[w];
-                    child2.weights[w] = population[bIndex].weights[w];
+                    child.weights[w] = population[aParentIndex].weights[w];
                 }
                 else
                 {
-                    child1.weights[w] = population[bIndex].weights[w];
-                    child2.weights[w] = population[aIndex].weights[w];
+                    child.weights[w] = population[bParentIndex].weights[w];
                 }
             }
 
-            for(int w = 0; w < child1.biases.Count; w++)
+            for(int w = 0; w < child.biases.Count; w++)
             {
                 if(Random.Range(0.0f, 1.0f) < 0.5f)
                 {
-                    child1.biases[w] = population[aIndex].biases[w];
-                    child2.biases[w] = population[bIndex].biases[w];
+                    child.biases[w] = population[aParentIndex].biases[w];
                 }
                 else
                 {
-                    child1.biases[w] = population[bIndex].biases[w];
-                    child2.biases[w] = population[aIndex].biases[w];
+                    child.biases[w] = population[bParentIndex].biases[w];
                 }
             }
 
-            newPopulation[naturallySelected] = child1;
-            naturallySelected++;
-            newPopulation[naturallySelected] = child2;
+            newPopulation[naturallySelected] = child;
             naturallySelected++;
 
         }
@@ -275,7 +252,8 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
     void Mutate(NeuralNetwork[] newPopulation)
     {
-        for(int i = maintainBestWithNoMutation; i < naturallySelected; i++)
+        //randomise for each non-parent
+        for(int i = numberOfParents; i < naturallySelected; i++)
         {
             for(int c = 0; c < newPopulation[i].weights.Count; c++)
             {
@@ -284,7 +262,15 @@ public class MultiGenerationGeneticManager : MonoBehaviour
                     newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
                 }
             }
+            for (int c = 0; c < newPopulation[i].biases.Count; c++)
+            {
+                if (Random.Range(0.0f, 1.0f) < mutationRate)
+                {
+                    newPopulation[i].biases[c] = MutateMatrix(newPopulation[i].biases[c]);
+                }
+            }
         }
+
     }
 
     Matrix<float> MutateMatrix(Matrix<float> inMatrix)
@@ -305,7 +291,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             int randomRow = Random.Range(0, inMatrix.RowCount);
 
             float currentValue = inMatrix[randomRow, randomColumn];
-            inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-1f, 1f)), -1, 1);
+            inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-0.5f, 0.5f)), -1, 1);
         }
 
 
