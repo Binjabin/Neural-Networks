@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a233d5a056e19042f8801a84be9597e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentProgressIndex: 0
   visionDistance: 10
   driftFactor: 0.85
   accelerationFactor: 30

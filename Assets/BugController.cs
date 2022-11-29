@@ -8,7 +8,7 @@ public class BugController : MonoBehaviour
     Vector3 startPosition, startRotation;
     NeuralNetwork network;
     ClosestPoint progressTracker;
-    int progressIndex;
+    public int currentProgressIndex;
 
     [Header("Car Settings")]
     public float visionDistance = 5f;
@@ -57,7 +57,7 @@ public class BugController : MonoBehaviour
 
     private void Start()
     {
-        progressIndex = progressTracker.InitProgress(transform.position);
+        currentProgressIndex = progressTracker.InitProgress(transform.position);
     }
 
     void Reset()
@@ -141,11 +141,10 @@ public class BugController : MonoBehaviour
 
     void CalculateFitness()
     {
-        totalDistanceTravelled += Vector3.Distance(transform.position, lastPosition);
-        averageSpeed = totalDistanceTravelled/timeSinceStart;
-        overallFitness = (totalDistanceTravelled * distanceMultiplier) + (averageSpeed * averageSpeedMultiplier) + (((aSensor + bSensor + cSensor)/3)*sensorMultiplier);
+        
+        
 
-        if (timeSinceStart > 20 && overallFitness < 10)
+        if (timeSinceStart > 15 && overallFitness < 3)
         {
             Death();
         }
@@ -155,7 +154,18 @@ public class BugController : MonoBehaviour
             //save network to json
             Death();
         }
-        progressIndex = progressTracker.GetProgress(transform.position, progressIndex);
+        int newProgress = progressTracker.GetProgress(transform.position, currentProgressIndex);
+        if (newProgress != currentProgressIndex)
+        {
+            Debug.Log("Made progress: " + Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3));
+            totalDistanceTravelled += Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3);
+
+            currentProgressIndex = newProgress;
+            
+        }
+        averageSpeed = totalDistanceTravelled / timeSinceStart;
+        overallFitness = totalDistanceTravelled;
+        //overallFitness = (totalDistanceTravelled * distanceMultiplier) + (averageSpeed * averageSpeedMultiplier) + (((aSensor + bSensor + cSensor) / 3) * sensorMultiplier);
     }
 
     Vector3 input;
@@ -198,7 +208,7 @@ public class BugController : MonoBehaviour
         if(network != null)
         {
             outputValueList = network.RunNetwork(inputValueList);
-            accelerationInput = (outputValueList[0] + 1 )/ 2;
+            accelerationInput = outputValueList[0];
             turningInput = outputValueList[1];
         }
         
@@ -222,7 +232,7 @@ public class BugController : MonoBehaviour
         }
         else
         {
-            Reset();
+            
         }
         
     }

@@ -429,7 +429,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 295758036}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 08cf2251428e65f7480cfb1f38f73cad, type: 3}
   m_Name: 
@@ -450,7 +450,7 @@ MonoBehaviour:
   waveCounterText: {fileID: 205926539}
   highestFitnessText: {fileID: 241253566}
   LAYERS: 2
-  NEURONS: 5
+  NEURONS: 10
   INPUT_COUNT: 3
   OUTPUT_COUNT: 2
 --- !u!1 &477780618
@@ -481,7 +481,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
@@ -684,7 +684,7 @@ Transform:
   - {fileID: 1647748971}
   - {fileID: 640049099}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &822637804
 GameObject:
@@ -951,7 +951,7 @@ RectTransform:
   m_Children:
   - {fileID: 822637805}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2188,63 +2188,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1001 &1788497975
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4090908080971068325, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_Name
-      value: Bug!
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 26.835773
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -27.28075
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4090908080971068327, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
 --- !u!1 &2019136913
 GameObject:
   m_ObjectHideFlags: 0
@@ -2309,7 +2252,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2139213737
 GameObject:

@@ -23,23 +23,21 @@ public class ClosestPoint : MonoBehaviour
         Debug.DrawLine(carPos, closestPoint, Color.yellow);
         int outIndex = GetClosestPoint(closestPoint);
 
-        if (Mathf.Abs(outIndex - mostRecentPoint) > 1)
-        {
-            Debug.LogError("Skipped a point on the curve!");
-        }
+        
 
         if (outIndex > mostRecentPoint)
         {
             return outIndex;
         }
         //check if you were near the end last check, and is now near the begining
-        else if (mostRecentPoint == lastPoint && outIndex == 0)
+        else if (mostRecentPoint > lastPoint - 3 && outIndex < 3)
         {
             Debug.Log("Looped around!");
             return outIndex;
         }
         else
         {
+            //Debug.Log("Haven't progressed. Closest is " + outIndex + " and furthest is " + mostRecentPoint + "/" + lastPoint);
             return mostRecentPoint;
         }
 
@@ -102,7 +100,7 @@ public class ClosestPoint : MonoBehaviour
         {
 
         }
-        else if (Vector2.Distance(points[option1], points[closestIndex]) > Vector2.Distance(points[option2], points[closestIndex])
+        else if (Vector2.Distance(points[option1], points[closestIndex]) > Vector2.Distance(points[option2], points[closestIndex]))
         {
 
         }
