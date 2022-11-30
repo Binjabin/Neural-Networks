@@ -86,7 +86,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             }
 
         }
-        UpdateUI();
     }
 
     void SpawnGeneration()
@@ -117,10 +116,12 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             {
                 Debug.Log("Set new highest:" + fitness);
                 highestFitness = fitness;
+                UpdateUI();
             }
-           
-
-            
+            else
+            {
+                Debug.Log("Died with " + fitness + " Highest is " + highestFitness);
+            }
         }
         else
         {
@@ -255,6 +256,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         //randomise for each non-parent
         for(int i = numberOfParents; i < naturallySelected; i++)
         {
+            Debug.Log("Mutating: " + i);
             for(int c = 0; c < newPopulation[i].weights.Count; c++)
             {
                 if(Random.Range(0.0f, 1.0f) < mutationRate)

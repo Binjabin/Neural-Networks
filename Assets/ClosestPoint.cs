@@ -25,14 +25,13 @@ public class ClosestPoint : MonoBehaviour
         int outIndex = GetClosestPoint(closestPoint);
         Vector3 outPos = points[outIndex] + new Vector2(transform.position.x, transform.position.y);
         Debug.DrawLine(carPos, outPos, Color.blue);
-        Debug.Log(outIndex + " >>> " + mostRecentPoint);
         if (outIndex > mostRecentPoint)
         {
 
-            if (outIndex - mostRecentPoint > 3)
+            if (outIndex - mostRecentPoint > 10)
             {
                 //prevent cheating AIs
-                Debug.Log("Skipped more than 3 steps!");
+                Debug.Log("Skipped more than 10 steps!");
                 return mostRecentPoint;
                 
             }
@@ -43,7 +42,7 @@ public class ClosestPoint : MonoBehaviour
             
         }
         //check if you were near the end last check, and is now near the begining
-        else if (mostRecentPoint > lastPoint - 3 && outIndex < 3)
+        else if (mostRecentPoint > lastPoint - 10 && outIndex < 10)
         {
             return outIndex;
         }

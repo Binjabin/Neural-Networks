@@ -35,7 +35,7 @@ public class BugController : MonoBehaviour
     float averageSpeed;
 
     public LayerMask sensorLayerMask;
-    [SerializeField, Range(0f, 1f)]float aSensor, bSensor, cSensor;
+    [SerializeField, Range(0f, 1f)]float aSensor, bSensor, cSensor, dSensor, eSensor;
 
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
@@ -100,16 +100,18 @@ public class BugController : MonoBehaviour
 
     void InputSensors()
     {
-        Vector3 aDirection = Vector3.Normalize(transform.up + transform.right);
-        Vector3 bDirection = transform.up;
-        Vector3 cDirection = Vector3.Normalize(transform.up - transform.right);
+        Vector3 aDirection = -transform.right;
+        Vector3 bDirection = Vector3.Normalize(transform.up + transform.right);
+        Vector3 cDirection = transform.up;
+        Vector3 dDirection = Vector3.Normalize(transform.up - transform.right);
+        Vector3 eDirection = transform.right;
 
-
+        
         RaycastHit2D aHit = Physics2D.Raycast(transform.position, aDirection, visionDistance, sensorLayerMask);
         if(aHit.collider != null)
         {
             aSensor = 1 - (aHit.distance/visionDistance);
-            Debug.DrawRay(transform.position, aDirection * visionDistance, Color.red);
+            Debug.DrawLine(transform.position, aHit.point, Color.red);
             //Debug.Log("A:" + aSensor);
         }
         else
@@ -121,7 +123,7 @@ public class BugController : MonoBehaviour
         if(bHit.collider != null)
         {
             bSensor = 1 - (bHit.distance/visionDistance);
-            Debug.DrawRay(transform.position, bDirection * visionDistance, Color.red);
+            Debug.DrawLine(transform.position, bHit.point, Color.red);
             //Debug.Log("B:" + bSensor + " " + bHit.collider.gameObject);
         }
         else
@@ -133,12 +135,36 @@ public class BugController : MonoBehaviour
         if(cHit.collider != null)
         {
             cSensor = 1 - (cHit.distance/visionDistance);
-            Debug.DrawRay(transform.position, cDirection * visionDistance, Color.red);
+            Debug.DrawLine(transform.position, cHit.point, Color.red);
             //Debug.Log("C:" + cSensor);
         }
         else
         {
             cSensor = 0f;
+        }
+
+        RaycastHit2D dHit = Physics2D.Raycast(transform.position, dDirection, visionDistance, sensorLayerMask);
+        if(dHit.collider != null)
+        {
+            dSensor = 1 - (dHit.distance/visionDistance);
+            Debug.DrawLine(transform.position, dHit.point, Color.red);
+            //Debug.Log("A:" + aSensor);
+        }
+        else
+        {
+            aSensor = 0f;
+        }
+
+        RaycastHit2D eHit = Physics2D.Raycast(transform.position, eDirection, visionDistance, sensorLayerMask);
+        if(eHit.collider != null)
+        {
+            eSensor = 1 - (eHit.distance/visionDistance);
+            Debug.DrawLine(transform.position, eHit.point, Color.red);
+            //Debug.Log("A:" + aSensor);
+        }
+        else
+        {
+            aSensor = 0f;
         }
 
         
