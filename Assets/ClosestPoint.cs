@@ -21,8 +21,11 @@ public class ClosestPoint : MonoBehaviour
     {
         Vector2 closestPoint = coll.ClosestPoint(carPos);
         Debug.DrawLine(carPos, closestPoint, Color.yellow);
-        int outIndex = GetClosestPoint(closestPoint);
 
+        int outIndex = GetClosestPoint(closestPoint);
+        Vector3 outPos = points[outIndex] + new Vector2(transform.position.x, transform.position.y);
+        Debug.DrawLine(carPos, outPos, Color.blue);
+        Debug.Log(outIndex + " >>> " + mostRecentPoint);
         if (outIndex > mostRecentPoint)
         {
 
@@ -68,16 +71,20 @@ public class ClosestPoint : MonoBehaviour
         Vector2 currentPoint = Vector2.zero;
         int outIndex = 0;
         int index = 0;
-        foreach(Vector2 point in points)
+        Vector2 worldSpacePointAlongLine = pointAlongLine;
+
+        foreach (Vector2 point in points)
         {
-            if(Vector2.Distance(pointAlongLine, point) < dist)
+            Vector2 worldSpacePos = point + new Vector2(transform.position.x, transform.position.y);
+            if (Vector2.Distance(pointAlongLine, worldSpacePos) < dist)
             {
-                dist = Vector2.Distance(pointAlongLine, point);
+                dist = Vector2.Distance(pointAlongLine, worldSpacePos);
                 currentPoint = point;
-                outIndex = index; 
+                outIndex = index;
             }
             index++;
         }
+        Debug.DrawLine(worldSpacePointAlongLine, currentPoint + new Vector2(transform.position.x, transform.position.y), Color.green);
         return outIndex;
     }
 

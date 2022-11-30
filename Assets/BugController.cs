@@ -150,7 +150,7 @@ public class BugController : MonoBehaviour
         
         
 
-        if (timeSinceStart > 15 && overallFitness < 3)
+        if (timeSinceStart > 10 && overallFitness < timeSinceStart)
         {
             Death();
         }
@@ -161,6 +161,7 @@ public class BugController : MonoBehaviour
             Death();
         }
         int newProgress = progressTracker.GetProgress(transform.position, currentProgressIndex);
+        
         if (newProgress != currentProgressIndex)
         {
             totalDistanceTravelled += Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3);

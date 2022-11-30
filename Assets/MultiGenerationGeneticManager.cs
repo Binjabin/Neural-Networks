@@ -72,8 +72,8 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         for(int i = spawnedSoFar; i < populationPerWave * wavesSoFar; i++)
         {
             spawnedSoFar++;
-            GameObject newBug = GameObject.Instantiate(bugPrefab, spawnPoint);
-            
+            GameObject newBug = Instantiate(bugPrefab, spawnPoint.position, Quaternion.identity);
+            newBug.transform.parent = transform;
             var newBugController = newBug.GetComponent<BugController>();
             if(newBugController != null)
             {
