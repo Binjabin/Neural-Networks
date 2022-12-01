@@ -429,7 +429,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 295758036}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 08cf2251428e65f7480cfb1f38f73cad, type: 3}
   m_Name: 
@@ -437,10 +437,10 @@ MonoBehaviour:
   bugPrefab: {fileID: 4090908080971068325, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
   spawnPoint: {fileID: 477780619}
   wavesPerGeneration: 1
-  populationPerWave: 80
+  populationPerWave: 50
   delayBetweenGenerations: 2
-  numberOfParents: 4
-  mutationRate: 0.1
+  numberOfParents: 1
+  mutationRate: 0
   currentGeneration: 0
   currentlyAlive: 0
   generationCounterText: {fileID: 927082352}

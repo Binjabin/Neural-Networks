@@ -28,6 +28,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     int naturallySelected;
 
     NeuralNetwork[] population;
+    NeuralNetwork[] sortedPopulation;
 
     [Header("Debug")]
     public int currentGeneration;
@@ -53,6 +54,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     void Start()
     {
         initialPopulation = wavesPerGeneration * populationPerWave;
+        currentGeneration = 0;
         CreatePopulation();
     }
 
@@ -114,13 +116,13 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             population[populationIndex].fitness = fitness;
             if(fitness > highestFitness)
             {
-                Debug.Log("Set new highest:" + fitness);
+                //Debug.Log("Set new highest:" + fitness);
                 highestFitness = fitness;
                 UpdateUI();
             }
             else
             {
-                Debug.Log("Died with " + fitness + " Highest is " + highestFitness);
+                
             }
         }
         else
@@ -177,16 +179,9 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
         for(int i = 0; i < numberOfParents; i++)
         {
-            
             newPopulation[naturallySelected] = population[i].InitialiseCopy(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             newPopulation[naturallySelected].fitness = 0f;
-
-            int numberOfThisNetwork = Mathf.RoundToInt(population[i].fitness) * 10;
-
-            for(int c = 0; c < numberOfThisNetwork; c++)
-            {
-                genePool.Add(i);
-            }
+            genePool.Add(i);
             naturallySelected++;
         }
 
@@ -196,11 +191,12 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     private void SortPopulation()
     {
         population = population.OrderByDescending(x => x.fitness).ToArray();
+        sortedPopulation = population;
     }
 
     private void Crossover(NeuralNetwork[] newPopulation)
     {
-        for(int i = numberOfParents; i < initialPopulation; i+=1)
+        for(int i = numberOfParents; i < initialPopulation; i++)
         {
 
             int aParentIndex = 0;
@@ -210,10 +206,10 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             {
                 aParentIndex = genePool[Random.Range(0, genePool.Count)];
                 bParentIndex = genePool[Random.Range(0, genePool.Count)];
-                while(aParentIndex == bParentIndex)
-                {
-                    bParentIndex = genePool[Random.Range(0, genePool.Count)];
-                }
+                //while(aParentIndex == bParentIndex)
+                //{
+                //    bParentIndex = genePool[Random.Range(0, genePool.Count)];
+                //}
             }
 
             NeuralNetwork child = new NeuralNetwork();
@@ -244,7 +240,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
                     child.biases[w] = population[bParentIndex].biases[w];
                 }
             }
-
             newPopulation[naturallySelected] = child;
             naturallySelected++;
 
@@ -256,7 +251,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         //randomise for each non-parent
         for(int i = numberOfParents; i < naturallySelected; i++)
         {
-            Debug.Log("Mutating: " + i);
             for(int c = 0; c < newPopulation[i].weights.Count; c++)
             {
                 if(Random.Range(0.0f, 1.0f) < mutationRate)

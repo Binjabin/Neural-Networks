@@ -49,6 +49,8 @@ public class BugController : MonoBehaviour
     [SerializeField] Color parentColor;
     [SerializeField] Color standardColor;
 
+    MultiGenerationGeneticManager geneticManager;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -56,6 +58,7 @@ public class BugController : MonoBehaviour
         rotationAngle = transform.eulerAngles.z;
         progressTracker = FindObjectOfType<ClosestPoint>();
         renderer = GetComponentInChildren<SpriteRenderer>();
+        geneticManager = FindObjectOfType<MultiGenerationGeneticManager>();
         //test code
         //network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
 
@@ -64,27 +67,6 @@ public class BugController : MonoBehaviour
     private void Start()
     {
         currentProgressIndex = progressTracker.InitProgress(transform.position);
-    }
-
-    void Reset()
-    {
-        timeSinceStart = 0f;
-        totalDistanceTravelled = 0f;
-        averageSpeed = 0f;
-        lastPosition = startPosition;
-        overallFitness = 0f;
-        transform.position = startPosition;
-        transform.eulerAngles = startRotation;
-        Destroy(gameObject);
-
-        //network.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
-    }
-
-    public void ResetWithNetwork(NeuralNetwork net)
-    {
-        network = net;
-        isMultiSpawned = false;
-        Reset();
     }
 
     public void SpawnWithNetwork(NeuralNetwork net)
@@ -222,9 +204,6 @@ public class BugController : MonoBehaviour
 
     }
 
-    void Update()
-    {
-    }
 
     private void FixedUpdate() 
     {
@@ -267,8 +246,12 @@ public class BugController : MonoBehaviour
     {
         if(network != null)
         {
-            FindObjectOfType<MultiGenerationGeneticManager>().Death(overallFitness, network, genome);
+            geneticManager.Death(overallFitness, network, genome);
             Destroy(gameObject);
+            if(isParentOfGeneration)
+            {
+                //a
+            }
         }
         else
         {

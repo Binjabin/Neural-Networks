@@ -111,10 +111,12 @@ MonoBehaviour:
   aSensor: 0
   bSensor: 0
   cSensor: 0
+  dSensor: 0
+  eSensor: 0
   genome: 0
   isParentOfGeneration: 0
   parentColor: {r: 0, g: 0, b: 0, a: 1}
-  standardColor: {r: 1, g: 1, b: 1, a: 1}
+  standardColor: {r: 1, g: 1, b: 1, a: 0.27058825}
 --- !u!1 &4090908081112225933
 GameObject:
   m_ObjectHideFlags: 0
