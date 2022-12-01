@@ -81,13 +81,14 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             {
                 newBugController.SpawnWithNetwork(population[i]);
                 newBugController.genome = i;
-                if (i < numberOfParents)
+                if (i < numberOfParents && currentGeneration > 0)
                 {
                     newBugController.isParentOfGeneration = true;
                 }
             }
 
         }
+        UpdateUI();
     }
 
     void SpawnGeneration()
@@ -111,21 +112,14 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     public void Death(float fitness, NeuralNetwork network, int populationIndex)
     {
         currentlyAlive--;
-        if(currentlyAlive > 0)
+        population[populationIndex].fitness = fitness;
+        if(fitness > highestFitness)
         {
-            population[populationIndex].fitness = fitness;
-            if(fitness > highestFitness)
-            {
-                //Debug.Log("Set new highest:" + fitness);
-                highestFitness = fitness;
-                UpdateUI();
-            }
-            else
-            {
-                
-            }
+            //Debug.Log("Set new highest:" + fitness);
+            highestFitness = fitness;
+            UpdateUI();
         }
-        else
+        if(currentlyAlive == 0)
         {
             if(wavesSoFar < wavesPerGeneration)
             {
@@ -148,7 +142,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     {
         generationCounterText.text = "Generation: " + currentGeneration;
         waveCounterText.text = "Wave: " + wavesSoFar + "/" + wavesPerGeneration;
-        highestFitnessText.text = "Highest fitness: " + highestFitness;
+        highestFitnessText.text = "Highest fitness: " + System.Math.Round(highestFitness, 2);
 
     }
 
@@ -216,34 +210,59 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             child.Initialise(LAYERS, NEURONS, INPUT_COUNT, OUTPUT_COUNT);
             child.fitness = 0;
 
-            //improve later to randomise individual weights, not just sets of weights
             for(int w = 0; w < child.weights.Count; w++)
             {
-                if(Random.Range(0.0f, 1.0f) < 0.5f)
+
+                for(int x = 0; x < child.weights[w].RowCount; x++)
                 {
-                    child.weights[w] = population[aParentIndex].weights[w];
-                }
-                else
-                {
-                    child.weights[w] = population[bParentIndex].weights[w];
+                    for(int y = 0; y < child.weights[w].ColumnCount; y++)
+                    {
+                        if(Random.Range(0.0f, 1.0f) < 0.5f)
+                        {
+                            child.weights[w][x,y] = population[aParentIndex].weights[w][x, y];
+                        }
+                        else
+                        {
+                            child.weights[w][x,y] = population[bParentIndex].weights[w][x, y];
+                        }
+                    }
                 }
             }
 
             for(int w = 0; w < child.biases.Count; w++)
             {
-                if(Random.Range(0.0f, 1.0f) < 0.5f)
+                for(int x = 0; x < child.biases[w].RowCount; x++)
                 {
-                    child.biases[w] = population[aParentIndex].biases[w];
-                }
-                else
-                {
-                    child.biases[w] = population[bParentIndex].biases[w];
+                    for(int y = 0; y < child.biases[w].ColumnCount; y++)
+                    {
+                        if(Random.Range(0.0f, 1.0f) < 0.5f)
+                        {
+                            child.biases[w][x,y] = population[aParentIndex].biases[w][x, y];
+                        }
+                        else
+                        {
+                            child.biases[w][x,y] = population[bParentIndex].biases[w][x, y];
+                        }
+                    }
                 }
             }
             newPopulation[naturallySelected] = child;
             naturallySelected++;
-
         }
+    }
+
+    Matrix<float> CopyMatrix(Matrix<float> inMatrix)
+    {
+        Matrix<float> newMatrix = Matrix<float>.Build.Dense(inMatrix.RowCount, inMatrix.ColumnCount);
+            
+        for(int x = 0; x < inMatrix.RowCount; x++)
+        {
+            for(int y = 0; y < inMatrix.ColumnCount; y++)
+            {
+                newMatrix[x,y] = inMatrix[x,y];
+            }
+        }
+        return newMatrix;
     }
 
     void Mutate(NeuralNetwork[] newPopulation)

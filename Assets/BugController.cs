@@ -172,14 +172,14 @@ public class BugController : MonoBehaviour
         
         if (newProgress != currentProgressIndex)
         {
-            totalDistanceTravelled += Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 3);
+            totalDistanceTravelled += Mathf.Min(Mathf.Abs(newProgress - currentProgressIndex), 10);
 
             currentProgressIndex = newProgress;
             
         }
         averageSpeed = totalDistanceTravelled / timeSinceStart;
-        overallFitness = totalDistanceTravelled;
-        //overallFitness = (totalDistanceTravelled * distanceMultiplier) + (averageSpeed * averageSpeedMultiplier) + (((aSensor + bSensor + cSensor) / 3) * sensorMultiplier);
+        //(((aSensor + bSensor + cSensor) / 3) * sensorMultiplier)
+        overallFitness = (totalDistanceTravelled * distanceMultiplier) + (averageSpeed * averageSpeedMultiplier);
     }
 
     Vector3 input;

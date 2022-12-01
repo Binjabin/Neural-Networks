@@ -102,8 +102,8 @@ MonoBehaviour:
   turningInput: 0
   timeSinceStart: 0
   overallFitness: 0
-  distanceMultiplier: 1.4
-  averageSpeedMultiplier: 0.2
+  distanceMultiplier: 1
+  averageSpeedMultiplier: 0.5
   sensorMultiplier: 0
   sensorLayerMask:
     serializedVersion: 2
