@@ -46,6 +46,7 @@ public class BugController : MonoBehaviour
     [Header("Visuals")]
     public bool isParentOfGeneration;
     SpriteRenderer renderer;
+    TrailRenderer trail;
     [SerializeField] Color parentColor;
     [SerializeField] Color standardColor;
 
@@ -57,6 +58,7 @@ public class BugController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rotationAngle = transform.eulerAngles.z;
         progressTracker = FindObjectOfType<ClosestPoint>();
+        trail = GetComponentInChildren<TrailRenderer>();
         renderer = GetComponentInChildren<SpriteRenderer>();
         geneticManager = FindObjectOfType<MultiGenerationGeneticManager>();
         //test code
@@ -224,10 +226,16 @@ public class BugController : MonoBehaviour
             if(isParentOfGeneration)
             {
                 renderer.color = parentColor;
+                trail.startColor = parentColor;
+                trail.endColor = parentColor;
+                trail.sortingOrder = 1;
+                renderer.sortingOrder = 1;
             }
             else
             {
                 renderer.color = standardColor;
+                trail.startColor = standardColor;
+                trail.endColor = standardColor;
             }
         }
         

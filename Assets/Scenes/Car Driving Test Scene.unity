@@ -439,16 +439,16 @@ MonoBehaviour:
   wavesPerGeneration: 2
   populationPerWave: 60
   delayBetweenGenerations: 2
-  numberOfParents: 5
-  mutationRate: 0.05
+  numberOfParents: 4
+  mutationRate: 0.09
   currentGeneration: 0
   currentlyAlive: 0
   generationCounterText: {fileID: 927082352}
   waveCounterText: {fileID: 205926539}
   highestFitnessText: {fileID: 241253566}
-  LAYERS: 2
+  LAYERS: 1
   NEURONS: 10
-  INPUT_COUNT: 3
+  INPUT_COUNT: 5
   OUTPUT_COUNT: 2
 --- !u!1 &477780618
 GameObject:
@@ -855,6 +855,95 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 927082350}
   m_CullTransparentMesh: 1
+--- !u!1001 &935654790
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -60
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183676, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: LAYERS
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: NEURONS
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: nodeSize
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: lineWidth
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: graphWidth
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: INPUT_COUNT
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: graphHeight
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: inputValues.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183678, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: m_Name
+      value: Graph
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
 --- !u!1 &953079926
 GameObject:
   m_ObjectHideFlags: 0

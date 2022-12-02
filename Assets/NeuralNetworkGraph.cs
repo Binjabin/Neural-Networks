@@ -21,6 +21,7 @@ public class NeuralNetworkGraph : MonoBehaviour
     public float graphWidth;
     float distanceBetweenLayers;
     public float nodeSize;
+    public float lineWidth = 1f;
     public Gradient nodeGradient;
     public Gradient weightGradient;
     public GameObject nodePrefab;
@@ -30,7 +31,7 @@ public class NeuralNetworkGraph : MonoBehaviour
     public GameObject[][] nodeObjects;
     public GameObject[][][] weightObjects;
 
-    [Range(-1f, 1f)] public List<float> inputValues = new List<float>();
+    [Range(0f, 1f)] public List<float> inputValues = new List<float>();
     List<float> currentInputValues = new List<float>();
 
 
@@ -50,6 +51,12 @@ public class NeuralNetworkGraph : MonoBehaviour
     private void Awake()
     {
         NewGraph();
+    }
+
+    public void SetGraph(NeuralNetwork net)
+    {
+        network = net;
+        UpdateGraph();
     }
 
     void NewGraph()
@@ -149,6 +156,7 @@ public class NeuralNetworkGraph : MonoBehaviour
                         GameObject newLine = Instantiate(linePrefab);
                         weightObjects[i][j][k] = newLine;
                         newLine.transform.SetParent(transform, false);
+                      
                     }
                 }
             }
@@ -201,6 +209,8 @@ public class NeuralNetworkGraph : MonoBehaviour
                     line.GetComponent<LineRenderer>().SetPosition(1, transform.position + pos2);
                     line.GetComponent<LineRenderer>().startColor = GetWeightColor(network.weights[i][j, k]);
                     line.GetComponent<LineRenderer>().endColor = GetWeightColor(network.weights[i][j, k]);
+                    line.GetComponent<LineRenderer>().startWidth = lineWidth;
+                    line.GetComponent<LineRenderer>().endWidth = lineWidth;
 
                 }
             }

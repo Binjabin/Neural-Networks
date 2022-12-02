@@ -48,13 +48,14 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     //TMProUGUI averageFitness;
 
 
-
+    NeuralNetworkGraph graph;
 
 
     void Start()
     {
         initialPopulation = wavesPerGeneration * populationPerWave;
         currentGeneration = 0;
+        graph = FindObjectOfType<NeuralNetworkGraph>();
         CreatePopulation();
     }
 
@@ -95,6 +96,9 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     {
         wavesSoFar = 0;
         spawnedSoFar = 0;
+        
+
+
         SpawnWave();
     }
 
@@ -143,6 +147,11 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         generationCounterText.text = "Generation: " + currentGeneration;
         waveCounterText.text = "Wave: " + wavesSoFar + "/" + wavesPerGeneration;
         highestFitnessText.text = "Highest fitness: " + System.Math.Round(highestFitness, 2);
+
+        if (graph != null)
+        {
+            graph.SetGraph(population[0]);
+        }
 
     }
 
