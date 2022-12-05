@@ -437,10 +437,10 @@ MonoBehaviour:
   bugPrefab: {fileID: 4090908080971068325, guid: 9b9e2e373311fd158a1acc1923f99f1d, type: 3}
   spawnPoint: {fileID: 477780619}
   wavesPerGeneration: 2
-  populationPerWave: 60
-  delayBetweenGenerations: 2
-  numberOfParents: 4
-  mutationRate: 0.09
+  populationPerWave: 80
+  delayBetweenGenerations: 1
+  numberOfParents: 5
+  mutationRate: 0.3
   currentGeneration: 0
   currentlyAlive: 0
   generationCounterText: {fileID: 927082352}

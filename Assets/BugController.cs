@@ -36,7 +36,8 @@ public class BugController : MonoBehaviour
 
     public LayerMask sensorLayerMask;
     [SerializeField, Range(0f, 1f)]float aSensor, bSensor, cSensor, dSensor, eSensor;
-
+    Vector2 forwardVelocity;
+    Vector2 rightVelocity;
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
 
@@ -89,6 +90,7 @@ public class BugController : MonoBehaviour
         Vector3 cDirection = transform.up;
         Vector3 dDirection = Vector3.Normalize(transform.up - transform.right);
         Vector3 eDirection = transform.right;
+
 
         
         RaycastHit2D aHit = Physics2D.Raycast(transform.position, aDirection, visionDistance, sensorLayerMask);
@@ -193,8 +195,8 @@ public class BugController : MonoBehaviour
 
 
         //drift
-        Vector2 forwardVelocity = transform.up * Vector2.Dot(rb.velocity, transform.up);
-        Vector2 rightVelocity = transform.right * Vector2.Dot(rb.velocity, transform.right);
+        forwardVelocity = transform.up * Vector2.Dot(rb.velocity, transform.up);
+        rightVelocity = transform.right * Vector2.Dot(rb.velocity, transform.right);
         rb.velocity = forwardVelocity + rightVelocity * driftFactor;
 
         //turning
@@ -217,8 +219,12 @@ public class BugController : MonoBehaviour
         inputValueList.Add(aSensor);
         inputValueList.Add(bSensor);
         inputValueList.Add(cSensor);
+        inputValueList.Add(dSensor);
+        inputValueList.Add(eSensor);
+        //inputValueList.Add(forwardVelocity.magnitude);
+        //inputValueList.Add(rightVelocity.magnitude);
 
-        if(network != null)
+        if (network != null)
         {
             outputValueList = network.RunNetwork(inputValueList);
             accelerationInput = outputValueList[0];

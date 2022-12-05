@@ -103,7 +103,7 @@ MonoBehaviour:
   timeSinceStart: 0
   overallFitness: 0
   distanceMultiplier: 1
-  averageSpeedMultiplier: 0.5
+  averageSpeedMultiplier: 0.2
   sensorMultiplier: 0
   sensorLayerMask:
     serializedVersion: 2

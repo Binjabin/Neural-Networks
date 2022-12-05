@@ -21,7 +21,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     public float delayBetweenGenerations;
 
     [Header("Crossover Settings")]
-    [Range(2f, 100f)] public int numberOfParents = 1;
+    [Range(1, 100)] public int numberOfParents = 1;
     [Range(0f, 1f)] public float mutationRate = 0.055f;
 
     List<int> genePool = new List<int>();
@@ -209,10 +209,6 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             {
                 aParentIndex = genePool[Random.Range(0, genePool.Count)];
                 bParentIndex = genePool[Random.Range(0, genePool.Count)];
-                //while(aParentIndex == bParentIndex)
-                //{
-                //    bParentIndex = genePool[Random.Range(0, genePool.Count)];
-                //}
             }
 
             NeuralNetwork child = new NeuralNetwork();
@@ -279,18 +275,19 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         //randomise for each non-parent
         for(int i = numberOfParents; i < naturallySelected; i++)
         {
-            for(int c = 0; c < newPopulation[i].weights.Count; c++)
+            if (Random.Range(0.0f, 1.0f) < mutationRate)
             {
-                if(Random.Range(0.0f, 1.0f) < mutationRate)
+                if (Random.Range(0.0f, 1.0f) < 0.5f)
                 {
+                    //choose a weight
+                    int c = Random.Range(0, newPopulation[i].weights.Count);
                     newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
                 }
-            }
-            for (int c = 0; c < newPopulation[i].biases.Count; c++)
-            {
-                if (Random.Range(0.0f, 1.0f) < mutationRate)
+                else
                 {
-                    newPopulation[i].biases[c] = MutateMatrix(newPopulation[i].biases[c]);
+                    //choose a bias
+                    int c = Random.Range(0, newPopulation[i].biases.Count);
+                    newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
                 }
             }
         }
@@ -301,13 +298,9 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     {
         int numberOfWeights = inMatrix.RowCount * inMatrix.ColumnCount;
         //minimum 1 weight change
-        float minProportion = 1f/numberOfWeights;
-        
-        //max a 7th
-        float maxProportion = Mathf.Max(minProportion, 1f/7f);
 
-        float proportionOfWeightsToChange = Random.Range(minProportion, maxProportion);
-        int randomPoints = Mathf.RoundToInt(proportionOfWeightsToChange * numberOfWeights);
+
+        int randomPoints = 1;
 
         for(int i = 0; i < randomPoints; i++)
         {
@@ -315,7 +308,7 @@ public class MultiGenerationGeneticManager : MonoBehaviour
             int randomRow = Random.Range(0, inMatrix.RowCount);
 
             float currentValue = inMatrix[randomRow, randomColumn];
-            inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-0.5f, 0.5f)), -1, 1);
+            inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-0.2f, 0.2f)), -1, 1);
         }
 
 
