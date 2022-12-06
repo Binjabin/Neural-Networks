@@ -23,6 +23,8 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     [Header("Crossover Settings")]
     [Range(1, 100)] public int numberOfParents = 1;
     [Range(0f, 1f)] public float mutationRate = 0.055f;
+    [Range(0f, 1f)] public float mutationAmount = 0.055f;
+    [SerializeField] bool nudgeAllValuesOnMutate;
 
     List<int> genePool = new List<int>();
     int naturallySelected;
@@ -275,32 +277,82 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         //randomise for each non-parent
         for(int i = numberOfParents; i < naturallySelected; i++)
         {
+            DoMutation(newPopulation[i]);
+
             if (Random.Range(0.0f, 1.0f) < mutationRate)
             {
-                if (Random.Range(0.0f, 1.0f) < 0.5f)
+                if(nudgeAllValuesOnMutate)
                 {
-                    //choose a weight
-                    int c = Random.Range(0, newPopulation[i].weights.Count);
-                    newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
+                    //mutate all weights slightly
+                    for (int w = 0; w < newPopulation[i].weights.Count; w++)
+                    {
+                        newPopulation[i].weights[w] = NudgeValueMatrix(newPopulation[i].weights[w]);
+                    }
+                    for (int w = 0; w < newPopulation[i].biases.Count; w++)
+                    {
+                        newPopulation[i].biases[w] = NudgeValueMatrix(newPopulation[i].biases[w]);
+                    }
                 }
                 else
                 {
-                    //choose a bias
-                    int c = Random.Range(0, newPopulation[i].biases.Count);
-                    newPopulation[i].weights[c] = MutateMatrix(newPopulation[i].weights[c]);
+                    //nudge a single weight
+                    if (Random.Range(0.0f, 1.0f) < 0.5f)
+                    {
+                        //choose a weight
+                        int c = Random.Range(0, newPopulation[i].weights.Count);
+                        newPopulation[i].weights[c] = NudgeValueMatrix(newPopulation[i].weights[c]);
+                    }
+                    else
+                    {
+                        //choose a bias
+                        int c = Random.Range(0, newPopulation[i].biases.Count);
+                        newPopulation[i].weights[c] = NudgeValueMatrix(newPopulation[i].weights[c]);
+                    }
                 }
+                
             }
         }
 
     }
 
-    Matrix<float> MutateMatrix(Matrix<float> inMatrix)
+    void DoMutation(NeuralNetwork net)
+    {
+        int randomPoints = 0;
+        bool done = false;
+
+        //work out amount of values to mutate
+        while (!done)
+        {
+            if (Random.Range(0.0f, 1.0f) < mutationRate)
+            {
+                randomPoints++;
+            }
+            else
+            {
+                done = false;
+            }
+        }
+
+        //work out which matrix to mutate from
+        int numberOfMatricies = net.weights.Count + net.biases.Count;
+        Matrix<float> matrixChosen;
+        int matrixIndexChosen = Random.Range(0, numberOfMatricies);
+
+
+        if(matrixIndexChosen > net.weights.Count)
+        {
+            matrixChosen = net.biases[matrixIndexChosen - net.weights.Count];
+        }
+        else
+        {
+            matrixChosen = net.biases[matrixIndexChosen - net.weights.Count];
+        }
+
+    }
+
+    Matrix<float> NudgeValueMatrix(Matrix<float> inMatrix)
     {
         int numberOfWeights = inMatrix.RowCount * inMatrix.ColumnCount;
-        //minimum 1 weight change
-
-
-        int randomPoints = 1;
 
         for(int i = 0; i < randomPoints; i++)
         {
@@ -309,6 +361,21 @@ public class MultiGenerationGeneticManager : MonoBehaviour
 
             float currentValue = inMatrix[randomRow, randomColumn];
             inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-0.2f, 0.2f)), -1, 1);
+        }
+
+
+        return inMatrix;
+    }
+
+    Matrix<float> NudgeWholeMatrix(Matrix<float> inMatrix)
+    {
+        for (int x = 0; x < inMatrix.RowCount; x++)
+        {
+            for (int y = 0; y < inMatrix.RowCount; y++)
+            {
+                float currentValue = inMatrix[x, y];
+                inMatrix[x, y] = Mathf.Clamp((currentValue + Random.Range(-mutationAmount, mutationAmountf)), -1, 1);
+            }
         }
 
 
