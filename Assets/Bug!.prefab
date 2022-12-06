@@ -116,7 +116,7 @@ MonoBehaviour:
   genome: 0
   isParentOfGeneration: 0
   parentColor: {r: 0, g: 0.07058824, b: 0.88235295, a: 1}
-  standardColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 0.27058825}
+  standardColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 0.47058824}
 --- !u!1 &4090908081112225933
 GameObject:
   m_ObjectHideFlags: 0

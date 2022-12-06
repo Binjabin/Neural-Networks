@@ -323,6 +323,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6275656278442183677, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
+      propertyPath: randomiseNetwork
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6275656278442183678, guid: c2a44095e05b1544b8d8dfa0aec98e88, type: 3}
       propertyPath: m_Name
       value: Graph
