@@ -439,9 +439,10 @@ MonoBehaviour:
   wavesPerGeneration: 2
   populationPerWave: 60
   delayBetweenGenerations: 1
-  numberOfParents: 5
-  mutationRate: 0.3
-  nudgeAllValuesOnMutate: 0
+  numberOfParents: 3
+  mutationRate: 0.5
+  mutationAmount: 0.1
+  nudgeAllValuesOnMutate: 1
   currentGeneration: 0
   currentlyAlive: 0
   generationCounterText: {fileID: 927082352}

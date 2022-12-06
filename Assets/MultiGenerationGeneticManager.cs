@@ -277,47 +277,29 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         //randomise for each non-parent
         for(int i = numberOfParents; i < naturallySelected; i++)
         {
-            DoMutation(newPopulation[i]);
-
-            if (Random.Range(0.0f, 1.0f) < mutationRate)
+            if (nudgeAllValuesOnMutate)
             {
-                if(nudgeAllValuesOnMutate)
+                for (int w = 0; w < newPopulation[i].weights.Count; w++)
                 {
-                    //mutate all weights slightly
-                    for (int w = 0; w < newPopulation[i].weights.Count; w++)
-                    {
-                        newPopulation[i].weights[w] = NudgeValueMatrix(newPopulation[i].weights[w]);
-                    }
-                    for (int w = 0; w < newPopulation[i].biases.Count; w++)
-                    {
-                        newPopulation[i].biases[w] = NudgeValueMatrix(newPopulation[i].biases[w]);
-                    }
+                    newPopulation[i].weights[w] = NudgeWholeMatrix(newPopulation[i].weights[w]);
                 }
-                else
+                for (int w = 0; w < newPopulation[i].biases.Count; w++)
                 {
-                    //nudge a single weight
-                    if (Random.Range(0.0f, 1.0f) < 0.5f)
-                    {
-                        //choose a weight
-                        int c = Random.Range(0, newPopulation[i].weights.Count);
-                        newPopulation[i].weights[c] = NudgeValueMatrix(newPopulation[i].weights[c]);
-                    }
-                    else
-                    {
-                        //choose a bias
-                        int c = Random.Range(0, newPopulation[i].biases.Count);
-                        newPopulation[i].weights[c] = NudgeValueMatrix(newPopulation[i].weights[c]);
-                    }
+                    newPopulation[i].biases[w] = NudgeWholeMatrix(newPopulation[i].biases[w]);
                 }
-                
             }
+            else
+            {
+                DoMutation(newPopulation[i]);
+            }
+
         }
 
     }
 
     void DoMutation(NeuralNetwork net)
     {
-        int randomPoints = 0;
+        int numberToRandomise = 0;
         bool done = false;
 
         //work out amount of values to mutate
@@ -325,44 +307,62 @@ public class MultiGenerationGeneticManager : MonoBehaviour
         {
             if (Random.Range(0.0f, 1.0f) < mutationRate)
             {
-                randomPoints++;
+                numberToRandomise++;
             }
             else
             {
-                done = false;
+                done = true;
             }
         }
 
-        //work out which matrix to mutate from
-        int numberOfMatricies = net.weights.Count + net.biases.Count;
+        //create list to select the matrix to choose from
+        List<int> indexsOfValues = new List<int>();
+        for (int i = 0; i < net.weights.Count; i++)
+        {
+            int valuesInMatrix = net.weights[i].RowCount * net.weights[i].ColumnCount;
+            for (int k = 0; k < valuesInMatrix; k++)
+            {
+                indexsOfValues.Add(i);
+            }
+        }
+        for (int i = 0; i < net.biases.Count; i++)
+        {
+            int valuesInMatrix = net.biases[i].RowCount * net.biases[i].ColumnCount;
+            for (int k = 0; k < valuesInMatrix; k++)
+            {
+                indexsOfValues.Add(i + net.weights.Count);
+            }
+        }
+
+        //randomise those weights
         Matrix<float> matrixChosen;
-        int matrixIndexChosen = Random.Range(0, numberOfMatricies);
-
-
-        if(matrixIndexChosen > net.weights.Count)
+        for (int i = 0; i < numberToRandomise; i++)
         {
-            matrixChosen = net.biases[matrixIndexChosen - net.weights.Count];
-        }
-        else
-        {
-            matrixChosen = net.biases[matrixIndexChosen - net.weights.Count];
-        }
+            int chosenMatrixIndex = indexsOfValues[Random.Range(0, indexsOfValues.Count)];
+            if(chosenMatrixIndex >= net.weights.Count)
+            {
+                //selected a bias
+                matrixChosen = net.biases[chosenMatrixIndex - net.weights.Count];
+                NudgeValueFromMatrix(matrixChosen);
 
+            }
+            else
+            {
+                //selected a weight
+                matrixChosen = net.weights[chosenMatrixIndex];
+                NudgeValueFromMatrix(matrixChosen);
+            }
+        }
     }
 
-    Matrix<float> NudgeValueMatrix(Matrix<float> inMatrix)
+    Matrix<float> NudgeValueFromMatrix(Matrix<float> inMatrix)
     {
-        int numberOfWeights = inMatrix.RowCount * inMatrix.ColumnCount;
 
-        for(int i = 0; i < randomPoints; i++)
-        {
-            int randomColumn = Random.Range(0, inMatrix.ColumnCount);
-            int randomRow = Random.Range(0, inMatrix.RowCount);
+        int randomColumn = Random.Range(0, inMatrix.ColumnCount);
+        int randomRow = Random.Range(0, inMatrix.RowCount);
 
-            float currentValue = inMatrix[randomRow, randomColumn];
-            inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-0.2f, 0.2f)), -1, 1);
-        }
-
+        float currentValue = inMatrix[randomRow, randomColumn];
+        inMatrix[randomRow, randomColumn] = Mathf.Clamp((currentValue + Random.Range(-mutationAmount, mutationAmount)), -1, 1);
 
         return inMatrix;
     }
@@ -371,10 +371,10 @@ public class MultiGenerationGeneticManager : MonoBehaviour
     {
         for (int x = 0; x < inMatrix.RowCount; x++)
         {
-            for (int y = 0; y < inMatrix.RowCount; y++)
+            for (int y = 0; y < inMatrix.ColumnCount; y++)
             {
                 float currentValue = inMatrix[x, y];
-                inMatrix[x, y] = Mathf.Clamp((currentValue + Random.Range(-mutationAmount, mutationAmountf)), -1, 1);
+                inMatrix[x, y] = Mathf.Clamp((currentValue + Random.Range(-mutationAmount, mutationAmount)), -1, 1);
             }
         }
 
