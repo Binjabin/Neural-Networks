@@ -19,7 +19,7 @@ public class BlobController : MonoBehaviour
     public float energyLossPerSecond = 1f;
     public float energyToReproduce = 30f;
     public float startingEnergy = 10f;
-
+    float timeAlive;
     
     List<float> inputValueList = new List<float>();
     List<float> outputValueList = new List<float>();
@@ -31,8 +31,13 @@ public class BlobController : MonoBehaviour
 
     BacteriaGeneticManager manager;
 
+    [SerializeField] Gradient colorOverTime;
+    [SerializeField] SpriteRenderer mainBlob;
+
+
     void Start()
     {
+        timeAlive = 0f;
         //look directions (8 directions around)
         currentEnergy = startingEnergy;
         for(int i = 0; i < viewDirections; i++)
@@ -41,23 +46,36 @@ public class BlobController : MonoBehaviour
             directionsToLook.Add(Quaternion.AngleAxis(thisAngle, new Vector3(0, 0, 1)) * new Vector3(1, 0, 0));
         }
         
-        
-        for (int i = 0; i < directionsToLook.Count; i++)
-        {
-            sensorValues.Add(0f);
-        }
+        sensorValues.Add(0f);
+        sensorValues.Add(0f);
+
+        //for (int i = 0; i < directionsToLook.Count; i++)
+        //{
+        //    sensorValues.Add(0f);
+        //}
         manager = FindObjectOfType<BacteriaGeneticManager>();
     }
-
+    void DirectionSensors()
+    {
+        Vector3 direction = GetNearestFoodDirection();
+        direction.Normalize();
+        sensorValues[0] = direction.x;
+        sensorValues[1] = direction.y;
+    }
     // Update is called once per frame
     void FixedUpdate()
     {
-        
-        InputSensors();
+
+        //InputSensors();
+        timeAlive += Time.deltaTime;
+        mainBlob.color = colorOverTime.Evaluate(Mathf.Clamp01(timeAlive / 90f));
+        DirectionSensors();
+
+       
 
         inputValueList = sensorValues;
 
-        if(network != null)
+        if (network != null)
         {
             outputValueList = network.RunNetwork(inputValueList);
 
@@ -132,6 +150,7 @@ public class BlobController : MonoBehaviour
         if(network != null)
         {
             Destroy(gameObject);
+            manager.currentlyAlive--;
         }
         
     }
@@ -167,5 +186,56 @@ public class BlobController : MonoBehaviour
         {
             MutateTraits();
         }
+    }
+
+    Vector3 GetNearestFoodDirection()
+    {
+        Vector3 directionToTravel = Vector3.zero;
+        float nearestDistance = Mathf.Infinity;
+        GameObject nearestObject = null;
+        foreach (GameObject foodObject in manager.foodList)
+        {
+            float x = 1;
+            float y = 1;
+            if (transform.position.x > 0) { x = -1; }
+            if (transform.position.y > 0) { y = -1; }
+
+            Vector3 altPos1 = new Vector3(transform.position.x + (manager.maxDistanceFromCenter * 2 * x), transform.position.y, 0);
+            Vector3 altPos2 = new Vector3(transform.position.x, transform.position.y + (manager.maxDistanceFromCenter * 2 * y), 0);
+            Vector3 altPos3 = new Vector3(transform.position.x + (manager.maxDistanceFromCenter * 2 * x), transform.position.y + (manager.maxDistanceFromCenter * 2 * y), 0);
+
+            float distanceFromOriginal = Vector3.Distance(transform.position, foodObject.transform.position);
+            float distanceFromAlt1 = Vector3.Distance(altPos1, foodObject.transform.position);
+            float distanceFromAlt2 = Vector3.Distance(altPos2, foodObject.transform.position);
+            float distanceFromAlt3 = Vector3.Distance(altPos3, foodObject.transform.position);
+
+            float thisDistance = Mathf.Min(distanceFromOriginal, distanceFromAlt1, distanceFromAlt2, distanceFromAlt3);
+
+            if (thisDistance < nearestDistance)
+            {
+                nearestDistance = thisDistance;
+                nearestObject = foodObject;
+
+                if (thisDistance == distanceFromOriginal)
+                {
+                    directionToTravel = foodObject.transform.position - transform.position;
+                }
+                else if (thisDistance == distanceFromAlt1)
+                {
+                    directionToTravel = foodObject.transform.position - altPos1;
+                }
+                else if (thisDistance == distanceFromAlt2)
+                {
+                    directionToTravel = foodObject.transform.position - altPos2;
+                }
+                else if (thisDistance == distanceFromAlt3)
+                {
+                    directionToTravel = foodObject.transform.position - altPos3;
+                }
+
+            }
+        }
+        Debug.DrawRay(transform.position, directionToTravel);
+        return directionToTravel;
     }
 }

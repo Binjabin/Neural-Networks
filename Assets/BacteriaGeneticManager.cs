@@ -39,6 +39,13 @@ public class BacteriaGeneticManager : MonoBehaviour
     [Header("Area Options")]
     public float maxDistanceFromCenter = 10f;
 
+    [Header("Population Graph")]
+    [SerializeField] LineRenderer line;
+    List<int> populationOverTime = new List<int>();
+    [SerializeField] float sampleTime = 1f;
+    float timeSinceLastSample;
+    [SerializeField] float graphWidth;
+
     void SpawnFood()
     {
         GameObject foodObject = Instantiate(foodPrefab, GetRandomPosInArena(), Quaternion.identity);
@@ -54,6 +61,28 @@ public class BacteriaGeneticManager : MonoBehaviour
         {
             SpawnFood();
         }
+        DoGraph();
+    }
+
+    void DoGraph()
+    {
+        timeSinceLastSample += Time.deltaTime;
+        if(timeSinceLastSample > sampleTime)
+        {
+            timeSinceLastSample = 0f;
+            populationOverTime.Add(currentlyAlive);
+        }
+        float offsetPerGraphPoint = graphWidth / (Mathf.Max(1, populationOverTime.Count - 1));
+        List<Vector3> linePositions = new List<Vector3>();
+        for(int i = 0; i < populationOverTime.Count; i++)
+        {
+            float x = offsetPerGraphPoint * i;
+            float y = populationOverTime[i] * 0.1f;
+            Vector3 pos = new Vector3(x, y, 0) + line.transform.position;
+            linePositions.Add(pos);
+        }
+        line.positionCount = linePositions.Count;
+        line.SetPositions(linePositions.ToArray());
     }
 
     public void DeleteFood(GameObject food)
@@ -83,6 +112,7 @@ public class BacteriaGeneticManager : MonoBehaviour
 
     void Start()
     {
+        float timeSinceLastSample = 0f;
         CreatePopulation();
         FillFood();
     }
@@ -99,6 +129,7 @@ public class BacteriaGeneticManager : MonoBehaviour
         for(int i = 0; i < initialPopulation; i++)
         {
             GameObject newAgent = GameObject.Instantiate(agentPrefab, GetRandomPosInArena(), Quaternion.identity);
+            currentlyAlive++;
             var newAgentController = newAgent.GetComponent<BlobController>();
             if(newAgentController != null)
             {
@@ -131,7 +162,7 @@ public class BacteriaGeneticManager : MonoBehaviour
         {
             if(Random.Range(0.0f, 1.0f) < mutationRate)
             {
-                agentToMutate.weights[c] = MutateMatrix(agentToMutate.weights[c]);
+                agentToMutate.weights[c] = NudgeWholeMatrix(agentToMutate.weights[c]);
             }
         }
     }
@@ -140,15 +171,15 @@ public class BacteriaGeneticManager : MonoBehaviour
     {
         int numberOfWeights = inMatrix.RowCount * inMatrix.ColumnCount;
         //minimum 1 weight change
-        float minProportion = 1f/numberOfWeights;
-        
+        float minProportion = 1f / numberOfWeights;
+
         //max a 7th
-        float maxProportion = Mathf.Max(minProportion, 1f/7f);
+        float maxProportion = Mathf.Max(minProportion, 1f / 7f);
 
         float proportionOfWeightsToChange = Random.Range(minProportion, maxProportion);
         int randomPoints = Mathf.RoundToInt(proportionOfWeightsToChange * numberOfWeights);
 
-        for(int i = 0; i < randomPoints; i++)
+        for (int i = 0; i < randomPoints; i++)
         {
             int randomColumn = Random.Range(0, inMatrix.ColumnCount);
             int randomRow = Random.Range(0, inMatrix.RowCount);
@@ -161,9 +192,23 @@ public class BacteriaGeneticManager : MonoBehaviour
         return inMatrix;
     }
 
+    Matrix<float> NudgeWholeMatrix(Matrix<float> inMatrix)
+    {
+        for (int x = 0; x < inMatrix.RowCount; x++)
+        {
+            for (int y = 0; y < inMatrix.ColumnCount; y++)
+            {
+                float currentValue = inMatrix[x, y];
+                inMatrix[x, y] = Mathf.Clamp((currentValue + Random.Range(-0.1f, 0.1f)), -1, 1);
+            }
+        }
+        return inMatrix;
+    }
+
     public void SpawnChild(NeuralNetwork net, Vector3 pos)
     {
         GameObject newAgent = Instantiate(agentPrefab, pos, Quaternion.identity);
+        currentlyAlive++;
         var newAgentController = newAgent.GetComponent<BlobController>();
         if(newAgentController != null)
         {
